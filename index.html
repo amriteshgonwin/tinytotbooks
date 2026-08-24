@@ -47,23 +47,9 @@
     <dialog id="searchDialog"><div class="dialog-head"><h2>Find a story</h2><button class="close" data-close="searchDialog">×</button></div><input id="searchInput" class="search-input" placeholder="Try 'animals', 'magic', or a title…" autofocus /><div id="searchResults" class="search-results"></div></dialog>
     <dialog id="checkoutDialog"><div class="dialog-head"><h2>Checkout</h2><button class="close" data-close="checkoutDialog">×</button></div><p class="muted">This is a payment-ready checkout layout. Payments are intentionally not connected in this offline demo.</p><form id="checkoutForm" class="checkout-form"><label>Name<input required placeholder="Your name" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required placeholder="House / street / city / PIN"></textarea></label><div class="payment-box"><span>🔒</span><div><b>Payment setup needed</b><p>Connect Razorpay, Stripe, or another provider before accepting payment.</p></div></div><button class="button button-dark" type="submit">Save order details</button></form><p id="checkoutNotice" class="form-notice"></p></dialog>
     <dialog id="bookDialog"></dialog>
-<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.18.0/firebase-firestore-compat.js"></script>
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyCorshUFx3jcPjfeUIpSsCRlF3IZGWDzqM",
-    authDomain: "tinytotbooks.firebaseapp.com",
-    projectId: "tinytotbooks",
-    storageBucket: "tinytotbooks.firebasestorage.app",
-    messagingSenderId: "837864488835",
-    appId: "1:837864488835:web:1935a1c63f92b8930240b6"
-  };
 
-  firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-</script>
-
-<script src="app.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.55.0/dist/umd/supabase.min.js"></script>
+    <script src="app.js"></script>
   </body>
 </html>

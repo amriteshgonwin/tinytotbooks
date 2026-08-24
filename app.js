@@ -1,3 +1,10 @@
+const SUPABASE_URL = 'https://xzwkombhtesozqobldvu.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_Ri_inFHaWpCyMAJHee8Zqw_YXdp3fnO';
+
+const supabase = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 const seedBooks = [
   {id:1,title:'The Moonbeam Garden',author:'Maya Rao',price:349,age:'4–6',genre:'Magic',rating:4.9,reviews:28,icon:'🌙',color:'#7767c9',description:'When a shy firefly loses her glow, a moonbeam garden helps her find a brave new kind of light.',available:true},
   {id:2,title:'Pippa and the Pocket Planet',author:'Nisha Iyer',price:399,age:'6–8',genre:'Adventure',rating:4.8,reviews:19,icon:'🪐',color:'#ef8162',description:'Pippa discovers a tiny planet in her coat pocket — complete with a very worried alien mayor.',available:true},
@@ -36,16 +43,77 @@ const defaultCharacters=[
 const storedContent=JSON.parse(localStorage.getItem('ss-content')||'null');
 
 const state={
-  books:JSON.parse(localStorage.getItem('ss-books')||'null')||seedBooks,
+  books:seedBooks,
   cart:JSON.parse(localStorage.getItem('ss-cart')||'[]'),
   shipping:Number(localStorage.getItem('ss-shipping')||799),
   content:{...defaultContent,...storedContent},
-  characters:JSON.parse(localStorage.getItem('ss-characters')||'null')||defaultCharacters,
+characters:defaultCharacters,
   admin:sessionStorage.getItem('ss-admin')==='yes',
   filter:'All',
   editingBook:null,
   editingCharacter:null
 };
+
+async function loadBooksFromSupabase() {
+  const { data, error } = await supabase
+    .from('books')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if (error) {
+    console.error('Could not load books from Supabase:', error);
+    return;
+  }
+
+  if (Array.isArray(data) && data.length) {
+    state.books = data;
+    route();
+  }
+}
+
+loadBooksFromSupabase();
+
+async function loadCharactersFromSupabase() {
+  const { data, error } = await supabase
+    .from('characters')
+    .select('*')
+    .order('id', { ascending: true });
+
+  if (error) {
+    console.error('Could not load characters from Supabase:', error);
+    return;
+  }
+
+  if (Array.isArray(data) && data.length) {
+    state.characters = data;
+    route();
+  }
+}
+
+loadCharactersFromSupabase();
+
+async function loadBookImagesFromSupabase() {
+  const { data, error } = await supabase
+    .from('book_images')
+    .select('*')
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    console.error('Could not load book images from Supabase:', error);
+    return;
+  }
+
+  // Attach images to the correct book
+  for (const book of state.books) {
+    book.images = (data || [])
+      .filter(image => image.book_id === book.id)
+      .sort((a, b) => a.sort_order - b.sort_order);
+  }
+
+  route();
+}
+
+loadBookImagesFromSupabase();
 
 const app=document.querySelector('#app');
 const money=n=>`₹${n.toLocaleString('en-IN')}`;
@@ -82,13 +150,18 @@ function esc(s){
   }[c]));
 }
 
-function cover(b,small=false){
-  const art=b.image
-    ? `<img class="cover-photo" src="${b.image}" alt="">`
-    : `<span class="${small?'':'cover-icon'}">${esc(b.icon)}</span>`;
-  return `<div class="${small?'cart-cover':'cover'}" style="background:${b.color}">${art}${small?'':`<span class="cover-title">${esc(b.title)}</span>`}</div>`;
-}
+function cover(b, small = false) {
+  const imageUrl =
+    b.images && b.images.length
+      ? b.images[0].image_url
+      : b.image;
 
+  const art = imageUrl
+    ? `<img class="cover-photo" src="${esc(imageUrl)}" alt="${esc(b.title)}">`
+    : `<span class="${small ? 'cart-cover-icon' : 'cover-icon'}">${esc(b.icon)}</span>`;
+
+  return `<div class="${small ? 'cart-cover' : 'cover'}" style="background:${b.color}">${art}${small ? '' : `<span class="cover-title">${esc(b.title)}</span>`}</div>`;
+}
 function bookCard(b){
   return `<article class="book-card">
     ${cover(b)}
@@ -1087,33 +1160,29 @@ window.addEventListener('hashchange',route);
 save();
 route();
 
-if (typeof db !== 'undefined') {
-  console.log("Firebase connected:", db);
+async function loadSiteSettings() {
+  const { data, error } = await supabase
+    .from('site_settings')
+    .select('key, value');
 
-  db.collection("siteSettings").doc("general").get()
-    .then(doc => {
-      if (!doc.exists) return;
+  if (error) {
+    console.error('Could not load site settings:', error);
+    return;
+  }
 
-      const data = doc.data();
+  for (const setting of data || []) {
+    if (setting.key === 'announcement') {
+      state.content.announcement = setting.value || 'Hi';
+    }
 
-      if (typeof data.shipping === "number") {
-        state.shipping = data.shipping;
-      }
+    if (setting.key === 'heroEyebrow') {
+      state.content.heroEyebrow =
+        setting.value || state.content.heroEyebrow;
+    }
+  }
 
-      if (typeof data.announcement === "string") {
-        state.content.announcement =
-          data.announcement.trim() || 'Hi';
-      }
-
-      updateAnnouncement();
-      renderCart();
-    })
-    .catch(error => {
-      console.error("Could not load website settings:", error);
-    });
-
-} else {
-  console.warn(
-    "Firebase is unavailable. Using local/default website settings."
-  );
+  updateAnnouncement();
+  route();
 }
+
+loadSiteSettings();
