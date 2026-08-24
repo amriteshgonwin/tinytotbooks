@@ -10,6 +10,7 @@ const seedBooks = [
 ];
 
 const defaultContent={
+  announcement:'Hi',
 
   heroEyebrow:'A little shop full of wonder',
   heroTitle:'Stories that make',
@@ -49,13 +50,25 @@ const state={
 const app=document.querySelector('#app');
 const money=n=>`₹${n.toLocaleString('en-IN')}`;
 
+function updateAnnouncement(){
+  const banner=document.querySelector('.announcement');
+  if(!banner)return;
+
+  const template=
+    typeof state.content.announcement==='string'&&state.content.announcement.trim()
+      ? state.content.announcement.trim()
+      : 'Hi';
+
+  banner.textContent=template.replace('{shipping}',money(state.shipping));
+}
+
 function save(){
   localStorage.setItem('ss-books',JSON.stringify(state.books));
   localStorage.setItem('ss-cart',JSON.stringify(state.cart));
   localStorage.setItem('ss-shipping',state.shipping);
   localStorage.setItem('ss-content',JSON.stringify(state.content));
   localStorage.setItem('ss-characters',JSON.stringify(state.characters));
-  document.querySelector('#shippingBanner').textContent=state.content.announcement.replace('{shipping}',money(state.shipping));
+  updateAnnouncement();
   updateCartBadge();
 }
 
@@ -1078,37 +1091,20 @@ console.log("Firebase connected:", db);
 
 db.collection("siteSettings").doc("general").get()
   .then(doc => {
-    if (doc.exists) {
-      console.log("Firebase shipping:", doc.data().shipping);
-    } else {
-      console.log("Firebase document not found");
+    if (!doc.exists) return;
+
+    const data=doc.data();
+
+    if (typeof data.shipping === "number") {
+      state.shipping=data.shipping;
     }
-  })
-  .catch(error => {
-    console.error("Firebase read error:", error);
-  });
 
-  db.collection("siteSettings").doc("general").get()
-  .then(doc => {
-    if (doc.exists) {
-      const data = doc.data();
-
-     if (typeof data.shipping === "number") {
-  state.shipping = data.shipping;
-}
-
-if (typeof data.announcement === "string") {
-  document.querySelector('.announcement').innerHTML =
-    data.announcement.replace(
-      /₹\s*\d+/,
-      `<strong id="shippingBanner">${money(state.shipping)}</strong>`
-    );
-}
-if (typeof data.heroEyebrow === "string") {
-  document.querySelector(".eyebrow").textContent = data.heroEyebrow;
-}
-renderCart();
+    if (typeof data.announcement === "string") {
+      state.content.announcement=data.announcement.trim()||'Hi';
     }
+
+    updateAnnouncement();
+    renderCart();
   })
   .catch(error => {
     console.error("Could not load website settings:", error);
