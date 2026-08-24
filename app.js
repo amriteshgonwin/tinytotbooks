@@ -10,7 +10,7 @@ const seedBooks = [
 ];
 
 const defaultContent={
-  announcement:'Free delivery on orders over {shipping} · Packed with a little extra joy ✨',
+
   heroEyebrow:'A little shop full of wonder',
   heroTitle:'Stories that make',
   heroHighlight:'little minds bloom.',
@@ -1073,3 +1073,43 @@ window.addEventListener('hashchange',route);
 
 save();
 route();
+
+console.log("Firebase connected:", db);
+
+db.collection("siteSettings").doc("general").get()
+  .then(doc => {
+    if (doc.exists) {
+      console.log("Firebase shipping:", doc.data().shipping);
+    } else {
+      console.log("Firebase document not found");
+    }
+  })
+  .catch(error => {
+    console.error("Firebase read error:", error);
+  });
+
+  db.collection("siteSettings").doc("general").get()
+  .then(doc => {
+    if (doc.exists) {
+      const data = doc.data();
+
+     if (typeof data.shipping === "number") {
+  state.shipping = data.shipping;
+}
+
+if (typeof data.announcement === "string") {
+  document.querySelector('.announcement').innerHTML =
+    data.announcement.replace(
+      /₹\s*\d+/,
+      `<strong id="shippingBanner">${money(state.shipping)}</strong>`
+    );
+}
+if (typeof data.heroEyebrow === "string") {
+  document.querySelector(".eyebrow").textContent = data.heroEyebrow;
+}
+renderCart();
+    }
+  })
+  .catch(error => {
+    console.error("Could not load website settings:", error);
+  });
