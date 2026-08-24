@@ -1087,25 +1087,33 @@ window.addEventListener('hashchange',route);
 save();
 route();
 
-console.log("Firebase connected:", db);
+if (typeof db !== 'undefined') {
+  console.log("Firebase connected:", db);
 
-db.collection("siteSettings").doc("general").get()
-  .then(doc => {
-    if (!doc.exists) return;
+  db.collection("siteSettings").doc("general").get()
+    .then(doc => {
+      if (!doc.exists) return;
 
-    const data=doc.data();
+      const data = doc.data();
 
-    if (typeof data.shipping === "number") {
-      state.shipping=data.shipping;
-    }
+      if (typeof data.shipping === "number") {
+        state.shipping = data.shipping;
+      }
 
-    if (typeof data.announcement === "string") {
-      state.content.announcement=data.announcement.trim()||'Hi';
-    }
+      if (typeof data.announcement === "string") {
+        state.content.announcement =
+          data.announcement.trim() || 'Hi';
+      }
 
-    updateAnnouncement();
-    renderCart();
-  })
-  .catch(error => {
-    console.error("Could not load website settings:", error);
-  });
+      updateAnnouncement();
+      renderCart();
+    })
+    .catch(error => {
+      console.error("Could not load website settings:", error);
+    });
+
+} else {
+  console.warn(
+    "Firebase is unavailable. Using local/default website settings."
+  );
+}
