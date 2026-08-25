@@ -67,11 +67,10 @@ async function loadBooksFromSupabase() {
 
   if (Array.isArray(data) && data.length) {
     state.books = data;
-    route();
+    // route later
   }
 }
 
-loadBooksFromSupabase();
 
 async function loadCharactersFromSupabase() {
   const { data, error } = await supabase
@@ -86,11 +85,10 @@ async function loadCharactersFromSupabase() {
 
   if (Array.isArray(data) && data.length) {
     state.characters = data;
-    route();
+    // route later
   }
 }
 
-loadCharactersFromSupabase();
 
 async function loadBookImagesFromSupabase() {
   const { data, error } = await supabase
@@ -104,16 +102,17 @@ async function loadBookImagesFromSupabase() {
   }
 
   // Attach images to the correct book
+  console.log('BOOK IMAGES LOADED:', data);
+
   for (const book of state.books) {
     book.images = (data || [])
-      .filter(image => image.book_id === book.id)
-      .sort((a, b) => a.sort_order - b.sort_order);
+.filter(image => Number(image.book_id) === Number(book.id))
+    .sort((a, b) => a.sort_order - b.sort_order);
   }
 
-  route();
+  // route later
 }
 
-loadBookImagesFromSupabase();
 
 const app=document.querySelector('#app');
 const money=n=>`₹${n.toLocaleString('en-IN')}`;
@@ -1182,7 +1181,17 @@ async function loadSiteSettings() {
   }
 
   updateAnnouncement();
+  // route later
+}
+
+async function initializeApp() {
+  await loadSiteSettings();
+  await loadBooksFromSupabase();
+  await loadCharactersFromSupabase();
+  await loadBookImagesFromSupabase();
+
+  updateAnnouncement();
   route();
 }
 
-loadSiteSettings();
+initializeApp();
