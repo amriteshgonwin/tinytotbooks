@@ -1,0 +1,1390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TinyTotBooks Manager</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f7f3eb;
+      color: #24343d;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    .page {
+      max-width: 1050px;
+      margin: 0 auto;
+      padding: 28px 18px 60px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .brand {
+      font-size: 1.5rem;
+      font-weight: 800;
+    }
+
+    .muted {
+      color: #687277;
+    }
+
+    .card {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow: 0 8px 30px rgba(30, 40, 45, .08);
+      margin-bottom: 20px;
+    }
+
+    h1,
+    h2,
+    h3 {
+      margin-top: 0;
+    }
+
+    label {
+      display: block;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #cbd2d5;
+      border-radius: 10px;
+      background: white;
+      margin-bottom: 16px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .primary {
+      background: #24343d;
+      color: white;
+    }
+
+    .secondary {
+      background: #eee7d9;
+      color: #24343d;
+    }
+
+    .danger {
+      background: #f5d7d7;
+      color: #8d2222;
+    }
+
+    .login {
+      max-width: 460px;
+      margin: 80px auto;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .status {
+      margin-top: 12px;
+      min-height: 22px;
+      font-size: .95rem;
+    }
+
+    .upload-area {
+      border: 2px dashed #c5cbc9;
+      border-radius: 15px;
+      padding: 25px;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .upload-area input {
+      margin-top: 15px;
+    }
+
+    .images {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .image-card {
+      border: 1px solid #dde2e1;
+      border-radius: 14px;
+      padding: 10px;
+      background: #fff;
+    }
+
+    .image-card.cover-image {
+      border: 3px solid #e2a51d;
+    }
+
+    .image-card img {
+      width: 100%;
+      height: 190px;
+      object-fit: cover;
+      border-radius: 10px;
+      display: block;
+      background: #eee;
+    }
+
+    .image-label {
+      font-size: .82rem;
+      font-weight: 700;
+      margin: 9px 0;
+    }
+
+    .image-actions {
+      display: flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+
+    .image-actions button {
+      padding: 8px 10px;
+      font-size: .82rem;
+    }
+
+    .cover-badge {
+      display: inline-block;
+      background: #e2a51d;
+      color: white;
+      padding: 4px 7px;
+      border-radius: 6px;
+      font-size: .72rem;
+      margin-bottom: 7px;
+    }
+
+    .hint {
+      font-size: .88rem;
+      color: #687277;
+      line-height: 1.5;
+    }
+
+    @media (max-width: 600px) {
+      .page {
+        padding: 18px 12px 40px;
+      }
+
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .images {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .image-card img {
+        height: 160px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LOGIN -->
+  <section id="loginScreen" class="login card">
+    <h1>TinyTotBooks Manager</h1>
+    <p class="muted">
+      Private book and image manager.
+    </p>
+
+    <form id="loginForm">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        autocomplete="username"
+        required
+        placeholder="Your admin email"
+      >
+
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        autocomplete="current-password"
+        required
+        placeholder="Your password"
+      >
+
+      <button class="primary" type="submit">
+        Sign in
+      </button>
+
+      <div id="loginStatus" class="status"></div>
+    </form>
+  </section>
+
+
+  <!-- MANAGER -->
+  <main id="managerScreen" class="page hidden">
+
+    <div class="topbar">
+      <div>
+        <div class="brand">TinyTotBooks Manager</div>
+        <div class="muted">Book image management</div>
+      </div>
+
+      <button id="logoutButton" class="secondary">
+        Log out
+      </button>
+    </div>
+
+
+    <section class="card">
+
+      <h2>Choose a book</h2>
+
+      <select id="bookSelect">
+        <option value="">Loading books...</option>
+      </select>
+
+<div id="bookInfo" class="muted"></div>
+
+<div id="conditionEditor" class="hidden" style="margin-top:20px;">
+
+  <label for="conditionNotes">
+    Book condition / notes
+  </label>
+
+  <textarea
+    id="conditionNotes"
+    rows="4"
+    placeholder="e.g. Good condition. Minor cover wear. Pages clean and intact."
+    style="
+      width:100%;
+      padding:13px 14px;
+      border:1px solid #cbd2d5;
+      border-radius:10px;
+      resize:vertical;
+      font:inherit;
+      margin-bottom:10px;
+    "
+  ></textarea>
+
+  <button
+    id="saveConditionButton"
+    class="primary"
+    type="button"
+  >
+    Save condition
+  </button>
+
+  <div
+    id="conditionStatus"
+    class="status"
+  ></div>
+
+</div>
+
+</section>
+
+    <section id="managerTools" class="card hidden">
+
+      <h2>Book images</h2>
+
+      <p class="hint">
+        The first image is always the main cover.
+        Use the arrows to control the order.
+        Images are automatically compressed before upload.
+      </p>
+
+      <div class="upload-area">
+
+        <strong>Add images</strong>
+
+        <p class="hint">
+          You can select multiple pictures at once.
+          JPG, PNG and WebP are supported.
+        </p>
+
+        <input
+          id="imageInput"
+          type="file"
+          accept="image/jpeg,image/png,image/webp"
+          multiple
+        >
+
+        <div id="uploadStatus" class="status"></div>
+
+      </div>
+
+      <div id="images" class="images"></div>
+
+    </section>
+
+  </main>
+
+
+<script>
+/* =========================================================
+   SUPABASE
+========================================================= */
+
+const SUPABASE_URL =
+  'https://xzwkombhtesozqobldvu.supabase.co';
+
+const SUPABASE_PUBLISHABLE_KEY =
+  'sb_publishable_Ri_inFHaWpCyMAJHee8Zqw_YXdp3fnO';
+
+const supabaseClient =
+  window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+
+/* =========================================================
+   ELEMENTS
+========================================================= */
+
+const loginScreen =
+  document.getElementById('loginScreen');
+
+const managerScreen =
+  document.getElementById('managerScreen');
+
+const loginForm =
+  document.getElementById('loginForm');
+
+const loginStatus =
+  document.getElementById('loginStatus');
+
+const logoutButton =
+  document.getElementById('logoutButton');
+
+const bookSelect =
+  document.getElementById('bookSelect');
+
+const bookInfo =
+  document.getElementById('bookInfo');
+
+const managerTools =
+  document.getElementById('managerTools');
+
+const imageInput =
+  document.getElementById('imageInput');
+
+const imagesContainer =
+  document.getElementById('images');
+
+const uploadStatus =
+  document.getElementById('uploadStatus');
+
+
+let books = [];
+let selectedBook = null;
+let currentImages = [];
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function setStatus(element, message, isError = false) {
+  element.textContent = message;
+  element.style.color = isError ? '#a52828' : '#687277';
+}
+
+
+function escapeHtml(value) {
+  return String(value ?? '').replace(/[&<>"']/g, char => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    '"': '&quot;',
+    "'": '&#039;'
+  }[char]));
+}
+
+
+/* =========================================================
+   AUTH
+========================================================= */
+
+async function checkSession() {
+
+  const {
+    data: { session }
+  } = await supabaseClient.auth.getSession();
+
+  if (session) {
+    showManager();
+  } else {
+    showLogin();
+  }
+}
+
+
+function showLogin() {
+
+  loginScreen.classList.remove('hidden');
+  managerScreen.classList.add('hidden');
+
+}
+
+
+function showManager() {
+
+  loginScreen.classList.add('hidden');
+  managerScreen.classList.remove('hidden');
+
+  loadBooks();
+
+}
+
+
+loginForm.addEventListener('submit', async event => {
+
+  event.preventDefault();
+
+  setStatus(loginStatus, 'Signing in...');
+
+  const email =
+    document.getElementById('email').value.trim();
+
+  const password =
+    document.getElementById('password').value;
+
+  const { error } =
+    await supabaseClient.auth.signInWithPassword({
+      email,
+      password
+    });
+
+  if (error) {
+
+    setStatus(
+      loginStatus,
+      error.message,
+      true
+    );
+
+    return;
+  }
+
+  setStatus(loginStatus, '');
+
+  showManager();
+
+});
+
+
+logoutButton.addEventListener('click', async () => {
+
+  await supabaseClient.auth.signOut();
+
+  selectedBook = null;
+  currentImages = [];
+
+  managerTools.classList.add('hidden');
+
+  showLogin();
+
+});
+
+
+/* =========================================================
+   LOAD BOOKS
+========================================================= */
+
+async function loadBooks() {
+
+  bookSelect.innerHTML =
+    '<option value="">Loading books...</option>';
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from('books')
+    .select('*')
+    .order('id', { ascending: true });
+
+
+  if (error) {
+
+    bookSelect.innerHTML =
+      '<option value="">Could not load books</option>';
+
+    console.error(error);
+
+    return;
+  }
+
+
+  books = data || [];
+
+  bookSelect.innerHTML =
+    '<option value="">Choose a book...</option>';
+
+
+  books.forEach(book => {
+
+    const option =
+      document.createElement('option');
+
+    option.value = book.id;
+
+    option.textContent =
+      `${book.title} — ${book.author}`;
+
+    bookSelect.appendChild(option);
+
+  });
+
+}
+
+
+/* =========================================================
+   BOOK SELECTION
+========================================================= */
+
+bookSelect.addEventListener('change', async () => {
+
+  const bookId =
+    bookSelect.value;
+
+  if (!bookId) {
+
+    selectedBook = null;
+    currentImages = [];
+
+    bookInfo.textContent = '';
+    managerTools.classList.add('hidden');
+
+    return;
+  }
+
+
+  selectedBook =
+    books.find(
+      book => String(book.id) === String(bookId)
+    );
+
+
+  if (!selectedBook) return;
+
+
+bookInfo.textContent =
+  `${selectedBook.title} · ${selectedBook.author}`;
+
+managerTools.classList.remove('hidden');
+
+await loadBookCondition();
+
+await loadImages();
+});
+
+
+/* =========================================================
+   LOAD IMAGES
+========================================================= */
+
+async function loadImages() {
+
+  imagesContainer.innerHTML =
+    '<p class="muted">Loading images...</p>';
+
+
+  const {
+    data,
+    error
+  } = await supabaseClient
+    .from('book_images')
+    .select('*')
+    .eq('book_id', selectedBook.id)
+    .order('sort_order', {
+      ascending: true
+    });
+
+
+  if (error) {
+
+    console.error(error);
+
+    imagesContainer.innerHTML =
+      '<p class="muted">Could not load images.</p>';
+
+    return;
+  }
+
+
+  currentImages = data || [];
+
+  renderImages();
+
+}
+
+
+/* =========================================================
+   RENDER IMAGES
+========================================================= */
+
+function renderImages() {
+
+  if (!currentImages.length) {
+
+    imagesContainer.innerHTML =
+      '<p class="muted">No images yet. The website will use the book icon/colour.</p>';
+
+    return;
+  }
+
+
+  imagesContainer.innerHTML =
+    currentImages.map((image, index) => {
+
+      const isCover =
+        index === 0;
+
+      return `
+        <div class="image-card ${isCover ? 'cover-image' : ''}">
+
+          ${
+            isCover
+              ? '<span class="cover-badge">MAIN COVER</span>'
+              : ''
+          }
+
+          <img
+            src="${escapeHtml(image.image_url)}"
+            alt=""
+          >
+
+          <div class="image-label">
+            Image ${index + 1}
+          </div>
+
+          <div class="image-actions">
+
+            ${
+              index > 0
+                ? `<button
+                     class="secondary"
+                     onclick="moveImage(${index}, -1)">
+                     ←
+                   </button>`
+                : ''
+            }
+
+            ${
+              index < currentImages.length - 1
+                ? `<button
+                     class="secondary"
+                     onclick="moveImage(${index}, 1)">
+                     →
+                   </button>`
+                : ''
+            }
+
+            <button
+              class="danger"
+              onclick="deleteImage(${index})">
+              Delete
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join('');
+
+}
+
+
+/* =========================================================
+   IMAGE COMPRESSION
+========================================================= */
+
+async function compressImage(file) {
+
+  const MAX_SIZE = 1600;
+  const QUALITY = 0.82;
+
+
+  const bitmap =
+    await createImageBitmap(file);
+
+
+  let width =
+    bitmap.width;
+
+  let height =
+    bitmap.height;
+
+
+  if (width > MAX_SIZE || height > MAX_SIZE) {
+
+    const scale =
+      Math.min(
+        MAX_SIZE / width,
+        MAX_SIZE / height
+      );
+
+    width =
+      Math.round(width * scale);
+
+    height =
+      Math.round(height * scale);
+
+  }
+
+
+  const canvas =
+    document.createElement('canvas');
+
+  canvas.width = width;
+  canvas.height = height;
+
+
+  const context =
+    canvas.getContext('2d');
+
+  context.drawImage(
+    bitmap,
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  const blob =
+    await new Promise(resolve => {
+
+      canvas.toBlob(
+        resolve,
+        'image/webp',
+        QUALITY
+      );
+
+    });
+
+
+  if (!blob) {
+    throw new Error('Could not compress image.');
+  }
+
+
+  return new File(
+    [blob],
+    `${Date.now()}-${Math.random()
+      .toString(36)
+      .slice(2)}.webp`,
+    {
+      type: 'image/webp'
+    }
+  );
+
+}
+
+
+/* =========================================================
+   UPLOAD IMAGES
+========================================================= */
+
+imageInput.addEventListener('change', async () => {
+
+  if (!selectedBook) return;
+
+  const files =
+    Array.from(imageInput.files || []);
+
+  if (!files.length) return;
+
+
+  if (
+    currentImages.length +
+    files.length >
+    10
+  ) {
+
+    setStatus(
+      uploadStatus,
+      'A book can have a maximum of 10 images.',
+      true
+    );
+
+    imageInput.value = '';
+
+    return;
+  }
+
+
+  try {
+
+    setStatus(
+      uploadStatus,
+      'Preparing images...'
+    );
+
+
+    for (
+      let i = 0;
+      i < files.length;
+      i++
+    ) {
+
+      const originalFile =
+        files[i];
+
+
+      setStatus(
+        uploadStatus,
+        `Compressing image ${i + 1} of ${files.length}...`
+      );
+
+
+      const compressedFile =
+        await compressImage(originalFile);
+
+
+      const nextOrder =
+        currentImages.length + 1;
+
+
+      const safeName =
+        compressedFile.name;
+
+
+      const storagePath =
+        `${selectedBook.id}/${safeName}`;
+
+
+      setStatus(
+        uploadStatus,
+        `Uploading image ${i + 1} of ${files.length}...`
+      );
+
+
+      const {
+        error: uploadError
+      } =
+        await supabaseClient
+          .storage
+          .from('book-images')
+          .upload(
+            storagePath,
+            compressedFile,
+            {
+              cacheControl: '31536000',
+              contentType: 'image/webp',
+              upsert: false
+            }
+          );
+
+
+      if (uploadError) {
+        throw uploadError;
+      }
+
+
+      const {
+        data: publicUrlData
+      } =
+        supabaseClient
+          .storage
+          .from('book-images')
+          .getPublicUrl(storagePath);
+
+
+      const imageUrl =
+        publicUrlData.publicUrl;
+
+
+      const {
+        error: rowError
+      } =
+        await supabaseClient
+          .from('book_images')
+          .insert({
+            book_id: selectedBook.id,
+            image_url: imageUrl,
+            image_type:
+              currentImages.length === 0
+                ? 'cover'
+                : 'gallery',
+            sort_order: nextOrder
+          });
+
+
+      if (rowError) {
+
+        /*
+          If the database row fails after the Storage upload,
+          clean up the orphaned file so Storage doesn't slowly
+          fill with unused images.
+        */
+
+        await supabaseClient
+          .storage
+          .from('book-images')
+          .remove([storagePath]);
+
+        throw rowError;
+      }
+
+
+      currentImages.push({
+        book_id: selectedBook.id,
+        image_url: imageUrl,
+        image_type:
+          currentImages.length === 0
+            ? 'cover'
+            : 'gallery',
+        sort_order: nextOrder,
+        storage_path: storagePath
+      });
+
+    }
+
+
+    setStatus(
+      uploadStatus,
+      'All images uploaded successfully.'
+    );
+
+
+    imageInput.value = '';
+
+    await loadImages();
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      uploadStatus,
+      `Upload failed: ${error.message}`,
+      true
+    );
+
+    await loadImages();
+
+  }
+
+});
+
+
+/* =========================================================
+   MOVE / REORDER IMAGE
+========================================================= */
+
+async function moveImage(index, direction) {
+
+  const newIndex =
+    index + direction;
+
+
+  if (
+    newIndex < 0 ||
+    newIndex >= currentImages.length
+  ) {
+    return;
+  }
+
+
+  const reordered =
+    [...currentImages];
+
+
+  const temp =
+    reordered[index];
+
+  reordered[index] =
+    reordered[newIndex];
+
+  reordered[newIndex] =
+    temp;
+
+
+  setStatus(
+    uploadStatus,
+    'Saving new image order...'
+  );
+
+
+  try {
+
+    for (
+      let i = 0;
+      i < reordered.length;
+      i++
+    ) {
+
+      const image =
+        reordered[i];
+
+      const newOrder =
+        i + 1;
+
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from('book_images')
+          .update({
+            sort_order: newOrder,
+            image_type:
+              newOrder === 1
+                ? 'cover'
+                : 'gallery'
+          })
+          .eq('id', image.id);
+
+
+      if (error) {
+        throw error;
+      }
+
+    }
+
+
+    currentImages =
+      reordered.map(
+        (image, index) => ({
+          ...image,
+          sort_order: index + 1,
+          image_type:
+            index === 0
+              ? 'cover'
+              : 'gallery'
+        })
+      );
+
+
+    renderImages();
+
+
+    setStatus(
+      uploadStatus,
+      'Order saved.'
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      uploadStatus,
+      `Could not save order: ${error.message}`,
+      true
+    );
+
+    await loadImages();
+
+  }
+
+}
+
+
+/* =========================================================
+   DELETE IMAGE
+========================================================= */
+
+async function deleteImage(index) {
+
+  const image =
+    currentImages[index];
+
+
+  if (!image) return;
+
+
+  const confirmed =
+    confirm(
+      index === 0
+        ? 'This is the main cover. Delete it?'
+        : 'Delete this image?'
+    );
+
+
+  if (!confirmed) return;
+
+
+  setStatus(
+    uploadStatus,
+    'Deleting image...'
+  );
+
+
+  try {
+
+    /*
+      Extract the Storage path from our known URL.
+
+      Our uploader stores files like:
+      book-images/BOOK_ID/FILENAME.webp
+    */
+
+    const url =
+      new URL(image.image_url);
+
+    const marker =
+      '/storage/v1/object/public/book-images/';
+
+    const markerIndex =
+      url.pathname.indexOf(marker);
+
+
+    if (markerIndex !== -1) {
+
+      const storagePath =
+        decodeURIComponent(
+          url.pathname.slice(
+            markerIndex + marker.length
+          )
+        );
+
+
+      const {
+        error: storageError
+      } =
+        await supabaseClient
+          .storage
+          .from('book-images')
+          .remove([storagePath]);
+
+
+      if (storageError) {
+        throw storageError;
+      }
+
+    }
+
+
+    const {
+      error: rowError
+    } =
+      await supabaseClient
+        .from('book_images')
+        .delete()
+        .eq('id', image.id);
+
+
+    if (rowError) {
+      throw rowError;
+    }
+
+
+    /*
+      Re-number the remaining images so there are
+      never gaps in sort_order.
+    */
+
+    await loadImages();
+
+
+    for (
+      let i = 0;
+      i < currentImages.length;
+      i++
+    ) {
+
+      const {
+        error
+      } =
+        await supabaseClient
+          .from('book_images')
+          .update({
+            sort_order: i + 1,
+            image_type:
+              i === 0
+                ? 'cover'
+                : 'gallery'
+          })
+          .eq(
+            'id',
+            currentImages[i].id
+          );
+
+
+      if (error) {
+        throw error;
+      }
+
+    }
+
+
+    await loadImages();
+
+
+    setStatus(
+      uploadStatus,
+      'Image deleted.'
+    );
+
+
+  } catch (error) {
+
+    console.error(error);
+
+    setStatus(
+      uploadStatus,
+      `Could not delete image: ${error.message}`,
+      true
+    );
+
+    await loadImages();
+
+  }
+
+}
+
+/* =========================================================
+   BOOK CONDITION
+========================================================= */
+
+const conditionEditor =
+  document.getElementById('conditionEditor');
+
+const conditionNotes =
+  document.getElementById('conditionNotes');
+
+const saveConditionButton =
+  document.getElementById('saveConditionButton');
+
+const conditionStatus =
+  document.getElementById('conditionStatus');
+
+
+async function loadBookCondition() {
+
+  if (!selectedBook) return;
+
+  conditionEditor.classList.remove('hidden');
+
+  conditionNotes.value =
+    selectedBook.condition_notes || '';
+
+  setStatus(conditionStatus, '');
+
+}
+
+
+saveConditionButton.addEventListener(
+  'click',
+  async () => {
+
+    if (!selectedBook) return;
+
+    const condition =
+      conditionNotes.value.trim();
+
+    setStatus(
+      conditionStatus,
+      'Saving...'
+    );
+
+    const {
+      error
+    } =
+      await supabaseClient
+        .from('books')
+        .update({
+          condition_notes: condition || null
+        })
+        .eq('id', selectedBook.id);
+
+
+    if (error) {
+
+      console.error(error);
+
+      setStatus(
+        conditionStatus,
+        `Could not save condition: ${error.message}`,
+        true
+      );
+
+      return;
+    }
+
+
+    selectedBook.condition_notes =
+      condition || null;
+
+
+    const index =
+      books.findIndex(
+        book =>
+          String(book.id) ===
+          String(selectedBook.id)
+      );
+
+
+    if (index !== -1) {
+      books[index].condition_notes =
+        condition || null;
+    }
+
+
+    setStatus(
+      conditionStatus,
+      'Condition saved.'
+    );
+
+  }
+);
+
+/* =========================================================
+   AUTH STATE LISTENER
+========================================================= */
+
+supabaseClient.auth.onAuthStateChange(
+  (event, session) => {
+
+    if (session) {
+      showManager();
+    } else {
+      showLogin();
+    }
+
+  }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+checkSession();
+
+</script>
+
+</body>
+</html>

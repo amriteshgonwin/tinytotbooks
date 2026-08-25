@@ -43,15 +43,29 @@ const defaultCharacters=[
 const storedContent=JSON.parse(localStorage.getItem('ss-content')||'null');
 
 const state={
+
   books:seedBooks,
+
   cart:JSON.parse(localStorage.getItem('ss-cart')||'[]'),
+
   shipping:Number(localStorage.getItem('ss-shipping')||799),
+
   content:{...defaultContent,...storedContent},
-characters:defaultCharacters,
+
+  characters:defaultCharacters,
+
+  monthlyPicks:[],
+
+  bundles:[],
+
   admin:sessionStorage.getItem('ss-admin')==='yes',
+
   filter:'All',
+
   editingBook:null,
+
   editingCharacter:null
+
 };
 
 async function loadBooksFromSupabase() {
@@ -89,6 +103,40 @@ async function loadCharactersFromSupabase() {
   }
 }
 
+async function loadMonthlyPicksFromSupabase() {
+  const { data, error } = await supabase
+    .from('monthly_picks')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    console.error('Could not load monthly picks:', error);
+    state.monthlyPicks = [];
+    return;
+  }
+
+  state.monthlyPicks = data || [];
+  console.log('MONTHLY PICKS LOADED:', state.monthlyPicks);
+}
+
+
+async function loadBundlesFromSupabase() {
+  const { data, error } = await supabase
+    .from('bundles')
+    .select('*')
+    .eq('active', true)
+    .order('sort_order', { ascending: true });
+
+  if (error) {
+    console.error('Could not load bundles:', error);
+    state.bundles = [];
+    return;
+  }
+
+  state.bundles = data || [];
+  console.log('BUNDLES LOADED:', state.bundles);
+}
 
 async function loadBookImagesFromSupabase() {
   const { data, error } = await supabase
@@ -161,21 +209,63 @@ function cover(b, small = false) {
 
   return `<div class="${small ? 'cart-cover' : 'cover'}" style="background:${b.color}">${art}${small ? '' : `<span class="cover-title">${esc(b.title)}</span>`}</div>`;
 }
+
 function bookCard(b){
-  return `<article class="book-card">
-    ${cover(b)}
-    <div class="book-meta">
-      <h3>${esc(b.title)}</h3>
-      <p>${esc(b.author)} · Ages ${b.age}</p>
-      <div class="book-bottom">
-        <span class="price">${money(b.price)}</span>
-        <span class="rating">★ ${b.rating} (${b.reviews})</span>
-        ${b.available
-          ? `<button class="mini-add" onclick="addToCart(${b.id})" aria-label="Add ${esc(b.title)}">+</button>`
-          : '<span class="status sold">Sold</span>'}
+
+  return `
+    <article
+      class="book-card"
+      onclick="openBook(${b.id})"
+      style="cursor:pointer"
+    >
+
+      ${cover(b)}
+
+      <div class="book-meta">
+
+        <h3>${esc(b.title)}</h3>
+
+        <p>
+          ${esc(b.author)} · Ages ${esc(b.age)}
+        </p>
+
+        <div class="book-bottom">
+
+          <span class="price">
+            ${money(b.price)}
+          </span>
+
+          <span class="rating">
+            ★ ${b.rating} (${b.reviews})
+          </span>
+
+          ${
+            b.available
+              ? `
+                <button
+                  class="mini-add"
+                  onclick="
+                    event.stopPropagation();
+                    addToCart(${b.id})
+                  "
+                  aria-label="Add ${esc(b.title)}"
+                >
+                  +
+                </button>
+              `
+              : `
+                <span class="status sold">
+                  Sold
+                </span>
+              `
+          }
+
+        </div>
+
       </div>
-    </div>
-  </article>`;
+
+    </article>
+  `;
 }
 
 function pageHero(eyebrow,title,text){
@@ -341,7 +431,10 @@ function renderAges(){
 }
 
 function renderMonthly(){
-  app.innerHTML=`
+
+  const picks = state.monthlyPicks || [];
+
+  app.innerHTML = `
     ${pageHero(
       'August reading box',
       'The Little Reader’s Club',
@@ -349,37 +442,84 @@ function renderMonthly(){
     )}
 
     <section class="section">
-      <div class="about-grid">
-        <div class="about-card">
-          <span class="eyebrow">Inside this month</span>
-          <h2>Garden magic & good friends</h2>
-          <p>August’s box is a warm mix of kindness, mystery and just enough magic for bedtime.</p>
-          <ul>
-            <li>The Moonbeam Garden</li>
-            <li>A Kite for Every Cloud</li>
-            <li>The Great Mango Mystery</li>
-            <li>Illustrated activity sheet</li>
-          </ul>
-          <p><b>₹899</b> · Ships free</p>
-          <button class="button button-dark" onclick="addBundle([1,5,3])">Add the August box</button>
-        </div>
 
-        <div>
-          <div class="bundle-art" style="height:100%;min-height:330px;background:#f7bdd0">🌙 🪁 🥭</div>
-        </div>
-      </div>
+      ${
+        picks.length
+          ? picks.map(p => `
+              <div class="about-grid">
+
+                <div class="about-card">
+
+                  <span class="eyebrow">
+                    ${esc(p.eyebrow || '')}
+                  </span>
+
+                  <h2>
+                    ${esc(p.title || '')}
+                  </h2>
+
+                  <p>
+                    ${esc(p.description || '')}
+                  </p>
+
+                  ${
+                    Array.isArray(p.items)
+                      ? `
+                        <ul>
+                          ${p.items.map(item => `
+                            <li>${esc(item)}</li>
+                          `).join('')}
+                        </ul>
+                      `
+                      : ''
+                  }
+
+                  <p>
+                    <b>${money(p.price || 0)}</b>
+                    · ${esc(p.shipping_text || '')}
+                  </p>
+
+                  <button
+                    class="button button-dark"
+                    onclick="addBundle([${(p.book_ids || []).join(',')}])"
+                  >
+                    ${esc(p.button_text || 'Add this box')}
+                  </button>
+
+                </div>
+
+                <div>
+                  <div
+                    class="bundle-art"
+                    style="
+                      height:100%;
+                      min-height:330px;
+                      background:${esc(p.artwork_color || '#f7bdd0')}
+                    "
+                  >
+                    ${esc(p.artwork || '✨')}
+                  </div>
+                </div>
+
+              </div>
+            `).join('')
+          : `
+            <div class="about-card">
+              <h2>No monthly picks right now</h2>
+              <p>Check back soon for the next reading box.</p>
+            </div>
+          `
+      }
+
     </section>
   `;
 }
 
 function renderBundles(){
-  const bundles=[
-    ['The Bedtime Basket','🌙',['The Moonbeam Garden','Nori’s Noisy Orchestra','A Kite for Every Cloud'],[1,6,5],899],
-    ['The Little Explorer','🧭',['Pippa and the Pocket Planet','The Cloud Collector','The Great Mango Mystery'],[2,7,3],999],
-    ['Tiny Giggles Gift','🎁',['Rumi’s Robot Rainy Day','Tara’s Tiny Tea Shop'],[4,8],649]
-  ];
 
-  app.innerHTML=`
+  const bundles = state.bundles || [];
+
+  app.innerHTML = `
     ${pageHero(
       'Ready-to-give magic',
       'Bundles made for wide eyes.',
@@ -387,21 +527,73 @@ function renderBundles(){
     )}
 
     <section class="section">
-      <div class="bundle-grid">
-        ${bundles.map(b=>`
-          <article class="bundle">
-            <div class="bundle-art">${b[1]}</div>
-            <h2>${b[0]}</h2>
-            <p class="muted">A beautiful set, gift-ready.</p>
-            <ul>${b[2].map(x=>`<li>${x}</li>`).join('')}</ul>
 
-            <div class="bundle-footer">
-              <strong>${money(b[4])}</strong>
-              <button class="button button-dark" onclick="addBundle([${b[3]}])">Add bundle</button>
-            </div>
-          </article>
-        `).join('')}
+      <div class="bundle-grid">
+
+        ${
+          bundles.length
+            ? bundles.map(b => `
+                <article class="bundle">
+
+                  <div class="bundle-art">
+                    ${esc(b.icon || '🎁')}
+                  </div>
+
+                  <h2>
+                    ${esc(b.title || '')}
+                  </h2>
+
+                  <p class="muted">
+                    ${esc(b.description || '')}
+                  </p>
+
+                  ${
+                    Array.isArray(b.book_ids)
+                      ? `
+                        <ul>
+                          ${
+                            b.book_ids.map(id => {
+                              const book = state.books.find(
+                                x => Number(x.id) === Number(id)
+                              );
+
+                              return book
+                                ? `<li>${esc(book.title)}</li>`
+                                : '';
+                            }).join('')
+                          }
+                        </ul>
+                      `
+                      : ''
+                  }
+
+                  <div class="bundle-footer">
+
+                    <strong>
+                      ${money(b.price || 0)}
+                    </strong>
+
+                    <button
+                      class="button button-dark"
+                      onclick="addBundle([${(b.book_ids || []).join(',')}])"
+                    >
+                      ${esc(b.button_text || 'Add bundle')}
+                    </button>
+
+                  </div>
+
+                </article>
+              `).join('')
+            : `
+                <div class="about-card">
+                  <h2>No bundles available</h2>
+                  <p>New bundles are coming soon.</p>
+                </div>
+              `
+        }
+
       </div>
+
     </section>
   `;
 }
@@ -955,23 +1147,39 @@ function renderAdmin(){
 }
 
 function route(){
-  const view=location.hash.slice(1).split('/')[0]||'home';
 
-  const pages={
-    home:renderHome,
-    books:renderBooks,
-    characters:renderCharacters,
-    ages:renderAges,
-    monthly:renderMonthly,
-    bundles:renderBundles,
-    about:renderAbout,
-    collabs:renderCollabs,
-    bulk:renderBulk,
-    contact:renderContact,
-    admin:renderAdmin
-  };
+  const parts = location.hash.slice(1).split('/');
+  const view = parts[0] || 'home';
 
-  (pages[view]||renderHome)();
+  if(view === 'book'){
+
+    const bookId = Number(parts[1]);
+
+    if(Number.isFinite(bookId)){
+      renderBookDetail(bookId);
+    }else{
+      renderBooks();
+    }
+
+  }else{
+
+    const pages={
+      home:renderHome,
+      books:renderBooks,
+      characters:renderCharacters,
+      ages:renderAges,
+      monthly:renderMonthly,
+      bundles:renderBundles,
+      about:renderAbout,
+      collabs:renderCollabs,
+      bulk:renderBulk,
+      contact:renderContact,
+      admin:renderAdmin
+    };
+
+    (pages[view]||renderHome)();
+
+  }
 
   document.querySelector('#mainNav').classList.remove('open');
   app.focus();
@@ -1084,7 +1292,14 @@ function openBook(id){
     </div>
 
     <div class="book-detail">
-      ${cover(b)}
+     <div
+  class="book-detail-cover-link"
+onclick="event.stopPropagation(); bookDialog.close(); location.hash='#book/${b.id}'"
+  style="cursor:pointer"
+  title="View full book details"
+>
+  ${cover(b)}
+</div>
 
       <div>
         <h1>${esc(b.title)}</h1>
@@ -1104,6 +1319,215 @@ function openBook(id){
   `;
 
   d.showModal();
+}
+
+/* =========================================================
+   BOOK DETAIL PAGE
+========================================================= */
+
+function renderBookDetail(id){
+
+  const b = state.books.find(
+    x => Number(x.id) === Number(id)
+  );
+
+  if(!b){
+    renderBooks();
+    return;
+  }
+
+  const images =
+    Array.isArray(b.images) && b.images.length
+      ? b.images
+      : [];
+
+  const mainImage =
+    images.length
+      ? images[0].image_url
+      : b.image;
+
+  app.innerHTML = `
+    <section class="book-detail-page">
+
+      <div class="book-detail-top">
+        <button
+          class="text-link"
+          type="button"
+          onclick="location.hash='#books'"
+        >
+          ← Back to books
+        </button>
+      </div>
+
+      <div class="book-detail-layout">
+
+        <div class="book-gallery">
+
+          <div
+            class="book-detail-main-image"
+            id="bookDetailMainImage"
+            style="background:${b.color || '#eee'}"
+          >
+            ${
+              mainImage
+                ? `<img
+                    src="${esc(mainImage)}"
+                    alt="${esc(b.title)}"
+                  >`
+                : `<span class="cover-icon">
+                    ${esc(b.icon || '📚')}
+                  </span>`
+            }
+          </div>
+
+          ${
+            images.length > 1
+              ? `
+                <div class="book-thumbnails">
+                  ${images.map((image,index)=>`
+                    <button
+                      type="button"
+                      class="book-thumbnail ${index === 0 ? 'active' : ''}"
+                      onclick="changeBookDetailImage(${index})"
+                      aria-label="View image ${index + 1}"
+                    >
+                      <img
+                        src="${esc(image.image_url)}"
+                        alt="${esc(b.title)} image ${index + 1}"
+                        loading="${index === 0 ? 'eager' : 'lazy'}"
+                      >
+                    </button>
+                  `).join('')}
+                </div>
+              `
+              : ''
+          }
+
+        </div>
+
+        <div class="book-detail-info">
+
+          <span class="tag">
+            ${esc(b.genre || 'Children’s book')}
+            · Ages ${esc(b.age || '')}
+          </span>
+
+          <h1>${esc(b.title)}</h1>
+
+          <p class="book-detail-author">
+            by ${esc(b.author)}
+          </p>
+
+          <div class="book-detail-rating">
+            ${
+              b.rating != null
+                ? `★ ${esc(b.rating)}`
+                : ''
+            }
+            ${
+              b.reviews
+                ? ` · ${esc(b.reviews)} readers`
+                : ''
+            }
+          </div>
+
+          <p class="book-detail-description">
+            ${esc(b.description || '')}
+          </p>
+
+          ${
+            b.condition_notes
+              ? `
+                <div class="book-condition">
+                  <h3>Book condition</h3>
+                  <p>${esc(b.condition_notes)}</p>
+                </div>
+              `
+              : ''
+          }
+
+          <div class="book-detail-purchase">
+
+            <strong class="book-detail-price">
+              ${money(b.price)}
+            </strong>
+
+            ${
+              b.available
+                ? `
+                  <button
+                    class="button button-dark"
+                    type="button"
+                    onclick="addToCart(${b.id})"
+                  >
+                    Add to bag
+                  </button>
+                `
+                : `
+                  <span class="status sold">
+                    Currently sold out
+                  </span>
+                `
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+  `;
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+}
+
+
+/* =========================================================
+   BOOK DETAIL IMAGE SWITCHER
+========================================================= */
+
+function changeBookDetailImage(index){
+
+  const id =
+    Number(location.hash.split('/')[1]);
+
+  const b =
+    state.books.find(
+      x => Number(x.id) === id
+    );
+
+  if(!b || !b.images || !b.images[index]) return;
+
+  const image =
+    b.images[index].image_url;
+
+  const main =
+    document.querySelector(
+      '#bookDetailMainImage'
+    );
+
+  if(!main) return;
+
+  main.innerHTML = `
+    <img
+      src="${esc(image)}"
+      alt="${esc(b.title)}"
+    >
+  `;
+
+  document
+    .querySelectorAll('.book-thumbnail')
+    .forEach((button,i)=>{
+      button.classList.toggle(
+        'active',
+        i === index
+      );
+    });
+
 }
 
 function setFilter(f){
@@ -1403,6 +1827,7 @@ save();
 route();
 
 async function loadSiteSettings() {
+
   const { data, error } = await supabase
     .from('site_settings')
     .select('key, value');
@@ -1413,28 +1838,43 @@ async function loadSiteSettings() {
   }
 
   for (const setting of data || []) {
-    if (setting.key === 'announcement') {
-      state.content.announcement = setting.value || 'Hi';
+
+    if (!setting.key) continue;
+
+    // Update any matching homepage content field automatically
+    if (
+      Object.prototype.hasOwnProperty.call(
+        state.content,
+        setting.key
+      )
+    ) {
+      state.content[setting.key] =
+        setting.value ?? state.content[setting.key];
     }
 
-    if (setting.key === 'heroEyebrow') {
-      state.content.heroEyebrow =
-        setting.value || state.content.heroEyebrow;
-    }
   }
 
   updateAnnouncement();
-  // route later
 }
 
 async function initializeApp() {
+
   await loadSiteSettings();
+
   await loadBooksFromSupabase();
+
   await loadCharactersFromSupabase();
+
   await loadBookImagesFromSupabase();
 
+  await loadMonthlyPicksFromSupabase();
+
+  await loadBundlesFromSupabase();
+
   updateAnnouncement();
+
   route();
+
 }
 
 initializeApp();
