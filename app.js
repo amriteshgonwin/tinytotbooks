@@ -54,6 +54,8 @@ const state={
 
   characters:defaultCharacters,
 
+  reviews:[],
+
   monthlyPicks:[],
 
   bundles:[],
@@ -161,6 +163,25 @@ async function loadBookImagesFromSupabase() {
   // route later
 }
 
+async function loadReviewsFromSupabase(){
+
+  const { data, error } = await supabase
+    .from('reviews')
+    .select('*')
+    .eq('published', true)
+    .order('sort_order', { ascending: true })
+    .order('review_date', { ascending: false });
+
+  if(error){
+    console.error('Could not load reviews from Supabase:', error);
+    state.reviews = [];
+    return;
+  }
+
+  state.reviews = Array.isArray(data) ? data : [];
+
+  console.log('REVIEWS LOADED:', state.reviews);
+}
 
 const app=document.querySelector('#app');
 const money=n=>`₹${n.toLocaleString('en-IN')}`;
@@ -598,6 +619,188 @@ function renderBundles(){
   `;
 }
 
+function formatReviewDate(date){
+
+  if(!date) return '';
+
+  const parsed = new Date(date);
+
+  if(Number.isNaN(parsed.getTime())){
+    return esc(String(date));
+  }
+
+  return parsed.toLocaleDateString('en-IN',{
+    day:'numeric',
+    month:'short',
+    year:'numeric'
+  });
+}
+
+
+function renderReviews(){
+
+  const reviews = Array.isArray(state.reviews)
+    ? state.reviews
+    : [];
+
+  app.innerHTML=`
+
+    ${pageHero(
+      'Kind words from our readers',
+      'Stories that found their way home.',
+      'A few lovely words from families who have discovered TinyTotBooks.'
+    )}
+
+    <section class="section reviews-page">
+
+      <div class="reviews-intro">
+
+        <span class="eyebrow">
+          From our readers
+        </span>
+
+        <h2>
+          Little books. Big love.
+        </h2>
+
+        <p>
+          Curious where these came from? find them waiting for you on our Google page <3
+        </p>
+
+      </div>
+
+
+      <div class="reviews-grid">
+
+        ${
+          reviews.length
+            ? reviews.map((review,index)=>`
+
+              <article
+                class="review-card"
+                style="--review-delay:${index * 0.06}s"
+              >
+
+                <div class="review-top">
+
+                  <div
+                    class="review-stars"
+                    aria-label="${review.stars} out of 5 stars"
+                  >
+                    ${'★'.repeat(Number(review.stars))}
+                    <span class="review-stars-empty">
+                      ${'★'.repeat(5 - Number(review.stars))}
+                    </span>
+                  </div>
+
+                  <span class="review-date">
+                    ${formatReviewDate(review.review_date)}
+                  </span>
+
+                </div>
+
+
+                <p class="review-text">
+                  “${esc(review.review)}”
+                </p>
+
+
+                <div class="review-person">
+
+                  <span class="review-avatar">
+                    ${esc(
+                      String(review.name || '?')
+                        .trim()
+                        .charAt(0)
+                        .toUpperCase()
+                    )}
+                  </span>
+
+                  <strong>
+                    ${esc(review.name)}
+                  </strong>
+
+                </div>
+
+              </article>
+
+            `).join('')
+            : `
+
+              <div class="about-card review-empty">
+
+                <h2>
+                  Our little review shelf is growing.
+                </h2>
+
+                <p>
+                  We’ll be adding lovely words from TinyTotBooks families soon.
+                </p>
+
+              </div>
+
+            `
+        }
+
+      </div>
+
+<div class="review-story-cta">
+
+  <div class="review-story-copy">
+
+    <span class="eyebrow">
+      A little more about us
+    </span>
+
+    <h2>
+      Seen the love? Come meet the story behind it.
+    </h2>
+
+    <p>
+      Every bookshop has a story. Ours began with a simple love
+      for wonderful books and little imaginations.
+    </p>
+
+  </div>
+
+  <a
+    class="button button-dark"
+    href="#about"
+  >
+    Read our story →
+  </a>
+
+</div>
+
+      <div class="google-review-cta">
+
+        <span class="eyebrow">
+          Want to see more?
+        </span>
+
+        <h2>
+          See what families are saying on Google.
+        </h2>
+
+        <p>
+          Read more reviews, share your own experience,
+          and say hello over on Google.
+        </p>
+
+<a
+  class="button button-dark google-review-button"
+  href="https://share.google/k90Tm6W3fiV4vgIuf"
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  Read our Google reviews ↗
+</a>
+        </div>
+
+    </section>
+  `;
+}
+
 function renderAbout(){
   app.innerHTML=`
     ${pageHero(
@@ -859,35 +1062,6 @@ function sendBulkWhatsApp(){
     `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
 
   window.open(url,'_blank','noopener');
-}
-
-function renderContact(){
-  app.innerHTML=`
-    ${pageHero(
-      'Let’s talk books',
-      'We’d love to hear from you.',
-      'Looking for a gift, a school order, or just the perfect story for a particular little reader?'
-    )}
-
-    <section class="section">
-      <div class="contact-grid">
-        <div>
-          <h2>Say hello</h2>
-          <p><b>Email</b><br>hello@tinytotbooks.example</p>
-          <p><b>Hours</b><br>Monday–Saturday · 10am–6pm</p>
-          <p><b>For gifts & school orders</b><br>Tell us the age, occasion and budget — we’ll make a lovely shortlist.</p>
-        </div>
-
-        <form class="contact-form" onsubmit="sendMessage(event)">
-          <label>Your name<input required placeholder="Name" /></label>
-          <label>Email<input required type="email" placeholder="you@example.com" /></label>
-          <label>Your message<textarea required placeholder="How can we help?"></textarea></label>
-          <button class="button button-dark">Send message</button>
-          <p class="form-notice" id="contactNotice"></p>
-        </form>
-      </div>
-    </section>
-  `;
 }
 
 function renderAdmin(){
@@ -1163,20 +1337,18 @@ function route(){
 
   }else{
 
-    const pages={
-      home:renderHome,
-      books:renderBooks,
-      characters:renderCharacters,
-      ages:renderAges,
-      monthly:renderMonthly,
-      bundles:renderBundles,
-      about:renderAbout,
-      collabs:renderCollabs,
-      bulk:renderBulk,
-      contact:renderContact,
-      admin:renderAdmin
-    };
-
+const pages={
+  home:renderHome,
+  books:renderBooks,
+  characters:renderCharacters,
+  ages:renderAges,
+  monthly:renderMonthly,
+  bundles:renderBundles,
+  about:renderAbout,
+  collabs:renderCollabs,
+  bulk:renderBulk,
+  reviews:renderReviews
+};
     (pages[view]||renderHome)();
 
   }
@@ -1870,6 +2042,9 @@ async function initializeApp() {
   await loadMonthlyPicksFromSupabase();
 
   await loadBundlesFromSupabase();
+
+  await loadReviewsFromSupabase();
+
 
   updateAnnouncement();
 

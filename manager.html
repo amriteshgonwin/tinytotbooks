@@ -729,47 +729,46 @@ function renderImages() {
 
 async function compressImage(file) {
 
-  const MAX_SIZE = 1600;
-  const QUALITY = 0.82;
+  /*
+    TinyTotBooks image optimizer
 
+    Goal:
+    - Keep book images sharp enough for reading
+    - Keep storage + egress low
+    - Never upload the original giant phone image
+  */
 
-  const bitmap =
-    await createImageBitmap(file);
+  const MAX_SIZE = 1400;
+  const TARGET_BYTES = 450 * 1024; // ~450 KB
+  const START_QUALITY = 0.78;
+  const MIN_QUALITY = 0.62;
 
+  const bitmap = await createImageBitmap(file);
 
-  let width =
-    bitmap.width;
+  let width = bitmap.width;
+  let height = bitmap.height;
 
-  let height =
-    bitmap.height;
-
-
+  /* Never upscale small images */
   if (width > MAX_SIZE || height > MAX_SIZE) {
 
-    const scale =
-      Math.min(
-        MAX_SIZE / width,
-        MAX_SIZE / height
-      );
+    const scale = Math.min(
+      MAX_SIZE / width,
+      MAX_SIZE / height
+    );
 
-    width =
-      Math.round(width * scale);
-
-    height =
-      Math.round(height * scale);
+    width = Math.round(width * scale);
+    height = Math.round(height * scale);
 
   }
 
-
-  const canvas =
-    document.createElement('canvas');
+  const canvas = document.createElement('canvas');
 
   canvas.width = width;
   canvas.height = height;
 
-
-  const context =
-    canvas.getContext('2d');
+  const context = canvas.getContext('2d', {
+    alpha: false
+  });
 
   context.drawImage(
     bitmap,
@@ -779,23 +778,102 @@ async function compressImage(file) {
     height
   );
 
+  bitmap.close();
 
-  const blob =
-    await new Promise(resolve => {
+  /*
+    First compression pass.
+  */
+  let quality = START_QUALITY;
 
-      canvas.toBlob(
-        resolve,
-        'image/webp',
-        QUALITY
-      );
+  let blob = await new Promise(resolve => {
 
-    });
+    canvas.toBlob(
+      resolve,
+      'image/webp',
+      quality
+    );
 
+  });
 
   if (!blob) {
     throw new Error('Could not compress image.');
   }
 
+  /*
+    If the image is still too large,
+    gradually reduce quality.
+  */
+  while (
+    blob.size > TARGET_BYTES &&
+    quality > MIN_QUALITY
+  ) {
+
+    quality -= 0.04;
+
+    blob = await new Promise(resolve => {
+
+      canvas.toBlob(
+        resolve,
+        'image/webp',
+        quality
+      );
+
+    });
+
+    if (!blob) {
+      throw new Error('Could not compress image.');
+    }
+
+  }
+
+  /*
+    If it is STILL too large at the minimum
+    quality, reduce dimensions once more.
+
+    This protects us from enormous phone photos
+    or unusually detailed scanned pages.
+  */
+  if (blob.size > TARGET_BYTES) {
+
+    const scale = 0.85;
+
+    const smallerCanvas =
+      document.createElement('canvas');
+
+    smallerCanvas.width =
+      Math.round(width * scale);
+
+    smallerCanvas.height =
+      Math.round(height * scale);
+
+    const smallerContext =
+      smallerCanvas.getContext('2d', {
+        alpha: false
+      });
+
+    smallerContext.drawImage(
+      canvas,
+      0,
+      0,
+      smallerCanvas.width,
+      smallerCanvas.height
+    );
+
+    blob = await new Promise(resolve => {
+
+      smallerCanvas.toBlob(
+        resolve,
+        'image/webp',
+        MIN_QUALITY
+      );
+
+    });
+
+    if (!blob) {
+      throw new Error('Could not compress image.');
+    }
+
+  }
 
   return new File(
     [blob],
@@ -808,7 +886,6 @@ async function compressImage(file) {
   );
 
 }
-
 
 /* =========================================================
    UPLOAD IMAGES
@@ -869,24 +946,36 @@ imageInput.addEventListener('change', async () => {
       const compressedFile =
         await compressImage(originalFile);
 
+const originalSizeMB =
+  originalFile.size / (1024 * 1024);
 
-      const nextOrder =
-        currentImages.length + 1;
+const optimizedSizeKB =
+  compressedFile.size / 1024;
 
+const savedPercent =
+  Math.max(
+    0,
+    Math.round(
+      (1 - compressedFile.size / originalFile.size) * 100
+    )
+  );
 
-      const safeName =
-        compressedFile.name;
+const nextOrder =
+  currentImages.length + 1;
 
+const safeName =
+  compressedFile.name;
 
-      const storagePath =
-        `${selectedBook.id}/${safeName}`;
+const storagePath =
+  `${selectedBook.id}/${safeName}`;
 
-
-      setStatus(
-        uploadStatus,
-        `Uploading image ${i + 1} of ${files.length}...`
-      );
-
+setStatus(
+  uploadStatus,
+  `Image ${i + 1} of ${files.length}: ` +
+  `${originalSizeMB.toFixed(2)} MB → ` +
+  `${optimizedSizeKB.toFixed(0)} KB ` +
+  `(${savedPercent}% smaller) — Uploading...`
+);
 
       const {
         error: uploadError
