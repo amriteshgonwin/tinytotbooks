@@ -432,6 +432,48 @@ function renderAbout(){
   `;
 }
 
+function renderCollabs(){
+  app.innerHTML=`
+    ${pageHero(
+      'Let’s create together',
+      'TinyTotBooks loves a good collaboration.',
+      'Are you a creator, school, brand, illustrator, storyteller, or simply someone who loves children’s books? We’d love to hear from you.'
+    )}
+
+    <section class="section">
+      <div class="about-grid">
+        <div>
+          <span class="eyebrow">Collab with us</span>
+          <h2>Let’s make something lovely.</h2>
+          <p>
+            We’re always open to thoughtful collaborations that bring
+            wonderful books and ideas to more little readers.
+          </p>
+          <p>
+            Tell us a little about yourself, what you have in mind,
+            and how you think we could work together.
+          </p>
+
+          <a
+            class="button button-dark"
+            href="YOUR_GOOGLE_FORM_LINK_HERE"
+            target="_blank"
+            rel="noopener"
+          >
+            Apply to collaborate
+          </a>
+        </div>
+
+        <div class="about-card">
+          <span style="font-size:4rem">🤝</span>
+          <h2>Who can collaborate?</h2>
+          <p>Creators · Schools · Brands · Illustrators · Authors · Book lovers</p>
+        </div>
+      </div>
+    </section>
+  `;
+}
+
 function renderContact(){
   app.innerHTML=`
     ${pageHero(
@@ -728,6 +770,7 @@ function route(){
     monthly:renderMonthly,
     bundles:renderBundles,
     about:renderAbout,
+    collabs:renderCollabs,
     contact:renderContact,
     admin:renderAdmin
   };
@@ -1101,7 +1144,7 @@ document.querySelector('#searchInput').oninput=searchBooks;
 
 function searchBooks(){
   const q=searchInput.value.toLowerCase();
-  
+
 if(!q.trim()){
   searchResults.innerHTML='<p class="empty">Start typing to find a story.</p>';
   return;
