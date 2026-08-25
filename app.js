@@ -474,6 +474,201 @@ function renderCollabs(){
   `;
 }
 
+function renderBulk(){
+  app.innerHTML=`
+    ${pageHero(
+      'Bulk & Events',
+      'Stories for big little moments.',
+      'Planning a birthday, school event, exhibition, return gifts, or a large book order? Tell us what you need and we’ll help you put together the perfect shelf.'
+    )}
+
+    <section class="section">
+      <div class="about-grid">
+        <div class="about-card">
+          <span class="eyebrow">Your bulk enquiry</span>
+          <h2>Let’s build your order.</h2>
+          <p class="muted">
+            Choose what you’re planning, how many books you need, and the
+            books you’re interested in.
+          </p>
+
+          <label>
+            What is this for?
+            <select id="bulkPurpose">
+              <option>Birthday party</option>
+              <option>Preschool / school</option>
+              <option>Exhibition / event</option>
+              <option>Return gifts</option>
+              <option>Business / corporate gifting</option>
+              <option>Bulk purchase</option>
+              <option>Something else</option>
+            </select>
+          </label>
+
+          <label>
+            Approximate number of books
+            <input
+              id="bulkQuantity"
+              type="number"
+              min="1"
+              value="50"
+            />
+          </label>
+
+          <label>
+            Your name
+            <input id="bulkName" placeholder="Your name" />
+          </label>
+
+          <label>
+            City
+            <input id="bulkCity" placeholder="Your city" />
+          </label>
+
+          <label>
+            Anything else?
+            <textarea
+              id="bulkNote"
+              placeholder="Age group, budget, event date, special requirements..."
+            ></textarea>
+          </label>
+        </div>
+
+        <div>
+          <div class="about-card">
+            <span style="font-size:4rem">📚</span>
+            <h2>Choose your books</h2>
+            <p class="muted">
+              Add the books you’re interested in. You can change the
+              quantities before sending your enquiry.
+            </p>
+
+            <div id="bulkBooks"></div>
+
+            <div class="total-row" style="margin-top:20px">
+              <strong>Total books</strong>
+              <strong id="bulkTotal">0</strong>
+            </div>
+
+            <button
+              class="button button-dark"
+              type="button"
+              onclick="sendBulkWhatsApp()"
+              style="margin-top:20px;width:100%"
+            >
+              💬 Send enquiry on WhatsApp
+            </button>
+
+            <p class="photo-note" style="margin-top:12px">
+              Your selections will be added automatically to the WhatsApp
+              message. You’ll just need to press Send.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  `;
+
+  renderBulkBooks();
+}
+
+function renderBulkBooks(){
+  const container=document.querySelector('#bulkBooks');
+  if(!container)return;
+
+  container.innerHTML=state.books.map(book=>`
+    <div class="bulk-book">
+      <div>
+        <strong>${esc(book.title)}</strong>
+        <p class="muted">${money(book.price)}</p>
+      </div>
+
+      <input
+        class="bulk-book-qty"
+        data-book-id="${book.id}"
+        type="number"
+        min="0"
+        value="0"
+        aria-label="Quantity for ${esc(book.title)}"
+        onchange="updateBulkTotal()"
+      />
+    </div>
+  `).join('');
+
+  updateBulkTotal();
+}
+
+function updateBulkTotal(){
+  const inputs=document.querySelectorAll('.bulk-book-qty');
+
+  let total=0;
+
+  inputs.forEach(input=>{
+    total+=Math.max(0,Number(input.value)||0);
+  });
+
+  const totalEl=document.querySelector('#bulkTotal');
+
+  if(totalEl){
+    totalEl.textContent=total;
+  }
+}
+
+function sendBulkWhatsApp(){
+  const purpose=document.querySelector('#bulkPurpose')?.value||'Bulk order';
+  const quantity=Math.max(
+    0,
+    Number(document.querySelector('#bulkQuantity')?.value)||0
+  );
+  const name=document.querySelector('#bulkName')?.value.trim()||'';
+  const city=document.querySelector('#bulkCity')?.value.trim()||'';
+  const note=document.querySelector('#bulkNote')?.value.trim()||'';
+
+  const selections=[...document.querySelectorAll('.bulk-book-qty')]
+    .map(input=>{
+      const qty=Math.max(0,Number(input.value)||0);
+      const book=state.books.find(
+        b=>Number(b.id)===Number(input.dataset.bookId)
+      );
+
+      return book && qty>0
+        ? `• ${book.title} × ${qty}`
+        : null;
+    })
+    .filter(Boolean);
+
+  if(!selections.length){
+    alert('Please choose at least one book.');
+    return;
+  }
+
+  const message=[
+    'Hi TinyTotBooks! 👋',
+    '',
+    'I’d like to enquire about a bulk / event order.',
+    '',
+    `Purpose: ${purpose}`,
+    `Approximate total: ${quantity} books`,
+    '',
+    'Books I’m interested in:',
+    ...selections,
+    '',
+    name ? `Name: ${name}` : '',
+    city ? `City: ${city}` : '',
+    note ? `Notes: ${note}` : '',
+    '',
+    'Could you please share your bulk pricing and availability?'
+  ]
+    .filter(Boolean)
+    .join('\n');
+
+  const whatsappNumber='918789677337';
+  const url=
+    `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`;
+
+  window.open(url,'_blank','noopener');
+}
+
 function renderContact(){
   app.innerHTML=`
     ${pageHero(
@@ -771,6 +966,7 @@ function route(){
     bundles:renderBundles,
     about:renderAbout,
     collabs:renderCollabs,
+    bulk:renderBulk,
     contact:renderContact,
     admin:renderAdmin
   };

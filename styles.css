@@ -160,7 +160,7 @@ textarea{min-height:100px;resize:vertical}
 .overlay.show{opacity:1;pointer-events:auto}
 
 .cart-line{display:flex;gap:13px;padding:18px 25px;border-bottom:1px solid var(--line)}
-.cart-cover{position:relative;width:52px;height:68px;min-width:52px;flex-shrink:0;overflow:hidden;border-radius:4px 8px 8px 4px;padding:0;font-size:1.7rem;color:#fff}
+
 .cart-line h3{font:600 1rem Fredoka;margin:2px 0 6px}
 .cart-line p{margin:0;color:#687277;font-size:.85rem}
 .line-info{flex:1}
@@ -297,4 +297,51 @@ footer h4{margin:0 0 12px;font-family:Fredoka}
     width:82%;
     max-width:360px;
   }
+}
+.bulk-book{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  padding:14px 0;
+  border-bottom:1px solid #e7e1dc;
+}
+
+.bulk-book:first-child{
+  padding-top:0;
+}
+
+.bulk-book p{
+  margin:4px 0 0;
+}
+
+.bulk-book-qty{
+  width:72px;
+  padding:9px 8px;
+  border:1px solid #d8d0ca;
+  border-radius:10px;
+  background:#fff;
+  font:inherit;
+  text-align:center;
+}
+
+#bulkBooks{
+  margin-top:18px;
+}
+
+#bulkBooks:empty::before{
+  content:"No books are available right now.";
+  display:block;
+  color:#687277;
+  padding:15px 0;
+}
+
+#bulkPurpose,
+#bulkQuantity,
+#bulkName,
+#bulkCity,
+#bulkNote{
+  width:100%;
+  box-sizing:border-box;
+  margin-top:6px;
 }
