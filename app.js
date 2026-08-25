@@ -1101,7 +1101,11 @@ document.querySelector('#searchInput').oninput=searchBooks;
 
 function searchBooks(){
   const q=searchInput.value.toLowerCase();
-
+  
+if(!q.trim()){
+  searchResults.innerHTML='<p class="empty">Start typing to find a story.</p>';
+  return;
+}
   const list=state.books.filter(
     b=>[b.title,b.author,b.genre,b.age]
       .join(' ')
