@@ -40,7 +40,6 @@ const defaultCharacters=[
   {id:103,title:'Big adventurers',description:'For explorers ready to travel far without leaving the sofa.',icon:'🚀',color:'#ded2ff',target:'Adventure'}
 ];
 
-const storedContent=JSON.parse(localStorage.getItem('ss-content')||'null');
 
 const state={
 
@@ -50,7 +49,7 @@ const state={
 
   shipping:Number(localStorage.getItem('ss-shipping')||799),
 
-  content:{...defaultContent,...storedContent},
+  content:defaultContent,
 
   characters:defaultCharacters,
 
@@ -202,7 +201,6 @@ function save(){
   localStorage.setItem('ss-books',JSON.stringify(state.books));
   localStorage.setItem('ss-cart',JSON.stringify(state.cart));
   localStorage.setItem('ss-shipping',state.shipping);
-  localStorage.setItem('ss-content',JSON.stringify(state.content));
   localStorage.setItem('ss-characters',JSON.stringify(state.characters));
   updateAnnouncement();
   updateCartBadge();
