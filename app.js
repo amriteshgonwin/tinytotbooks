@@ -25,7 +25,7 @@ const defaultContent={
   heroCopy:'Thoughtfully chosen books for curious kids — packed with imagination, kindness, and plenty of giggles.',
   heroButton:'Browse the bookshelf',
   collectionTitle:'A story for every kind of day',
-  saleText:'Need a gift? We’ll wrap it with a handwritten note.',
+  saleText:'Curious about the little story behind TinyTotBooks?',
   clubEyebrow:'A fresh story each month',
   clubTitle:'The Little Reader’s Club',
   clubText:'Age-right, joy-packed monthly reading picks, delivered to your door.',
@@ -314,25 +314,10 @@ function renderHome(){
       </div>
     </section>
 
-    <section class="section">
-      <div class="section-head">
-        <h2>${esc(c.collectionTitle)}</h2>
-        <a class="text-link" href="#characters">Meet the collections →</a>
-      </div>
+<!-- Homepage character collections intentionally hidden.
+     They remain available on the dedicated Characters page. -->
 
-      <div class="category-grid">
-        ${state.characters.slice(0,4).map(x=>`
-          <a class="category" style="background:${x.color}" href="#characters">
-            <b>${esc(x.title)}</b>
-            ${x.image
-              ? `<img class="category-photo" src="${x.image}" alt="">`
-              : `<span>${esc(x.icon)}</span>`}
-          </a>
-        `).join('')}
-      </div>
-    </section>
-
-    <section class="section" style="padding-top:0">
+    <section class="section" style="padding-top:45px">
       <div class="section-head">
         <h2>Fresh from the bookshelf</h2>
         <a class="text-link" href="#books">See all books →</a>
@@ -345,8 +330,8 @@ function renderHome(){
 
     <div class="sale-strip">
       <strong>${esc(c.saleText)}</strong>
-      <a class="button button-light" href="#bundles">Explore bundles</a>
-    </div>
+      <a class="button button-light" href="#about">Our Story →</a>
+      </div>
 
     <section class="section">
       <div class="feature-grid">
@@ -365,6 +350,59 @@ function renderHome(){
           <a class="button button-light" href="#ages">Browse by age</a>
           <span class="doodle">🌈</span>
         </article>
+
+        <article class="feature bundle-feature">
+
+  <span class="eyebrow">
+    Ready to share
+  </span>
+
+  <h2>
+    A little box of magic, all wrapped up.
+  </h2>
+
+  <p>
+    Discover thoughtful book bundles made for birthdays, surprises, and just-because moments.
+  </p>
+
+  <a
+    class="button button-dark"
+    href="#bundles"
+  >
+    Explore the bundles →
+  </a>
+
+  <span class="doodle">
+    🎁
+  </span>
+
+</article>
+       <article class="feature character-feature">
+
+  <span class="eyebrow">
+    Meet the characters
+  </span>
+
+  <h2>
+    Every story needs a great friend.
+  </h2>
+
+  <p>
+    From curious animals to magical mischief-makers, find the characters they’ll love meeting next.
+  </p>
+
+  <a
+    class="button button-dark"
+    href="#characters"
+  >
+    Meet the characters →
+  </a>
+
+  <span class="doodle">
+    🦊
+  </span>
+
+</article> 
       </div>
     </section>
   `;

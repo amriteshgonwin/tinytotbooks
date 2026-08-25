@@ -431,14 +431,110 @@ h3{
   transform:scale(1.05);
 }
 
+/* =========================================================
+   HOMEPAGE — OUR STORY INVITATION
+========================================================= */
+
 .sale-strip{
+  position:relative;
+  overflow:hidden;
+
   background:var(--teal);
-  padding:23px clamp(20px,6vw,92px);
+
+  padding:32px clamp(24px,7vw,100px);
+
   display:flex;
-  gap:22px;
   align-items:center;
   justify-content:center;
-  text-align:center;
+  gap:34px;
+
+  text-align:left;
+
+  border-radius:0;
+}
+
+
+/* Soft little decorative circles */
+
+.sale-strip::before,
+.sale-strip::after{
+  content:"";
+  position:absolute;
+  border:2px solid rgba(255,255,255,.28);
+  border-radius:50%;
+  pointer-events:none;
+}
+
+.sale-strip::before{
+  width:90px;
+  height:90px;
+  left:-35px;
+  bottom:-45px;
+}
+
+.sale-strip::after{
+  width:55px;
+  height:55px;
+  right:8%;
+  top:-30px;
+}
+
+
+/* Main message */
+
+.sale-strip strong{
+  position:relative;
+  z-index:1;
+
+  max-width:560px;
+
+  font-family:Fredoka;
+  font-size:1.45rem;
+  line-height:1.2;
+  font-weight:600;
+}
+
+
+/* Story button */
+
+.sale-strip .button{
+  position:relative;
+  z-index:1;
+
+  flex-shrink:0;
+
+  padding:13px 24px;
+
+  white-space:nowrap;
+
+  border-radius:999px;
+
+  font-size:.95rem;
+}
+
+
+/* Mobile */
+
+@media(max-width:650px){
+
+  .sale-strip{
+    padding:30px 24px;
+
+    flex-direction:column;
+    gap:18px;
+
+    text-align:center;
+  }
+
+  .sale-strip strong{
+    max-width:330px;
+    font-size:1.3rem;
+  }
+
+  .sale-strip .button{
+    padding:12px 22px;
+  }
+
 }
 
 .sale-strip strong{
@@ -448,10 +544,9 @@ h3{
 
 .feature-grid{
   display:grid;
-  grid-template-columns:1.25fr 1fr;
+  grid-template-columns:repeat(2,minmax(0,1fr));
   gap:25px;
 }
-
 .feature{
   border-radius:24px;
   padding:clamp(30px,5vw,58px);
@@ -478,7 +573,7 @@ h3{
   position:absolute;
   right:7%;
   bottom:-19px;
-  font-size:9rem;
+  font-size:6rem;
   transform:rotate(-15deg);
 }
 
@@ -2248,4 +2343,129 @@ footer h4{
     width:100%;
   }
 
+}
+
+/* =========================================================
+   HOMEPAGE — CHARACTERS FEATURE TILE
+========================================================= */
+
+.character-feature{
+  position:relative;
+  overflow:hidden;
+
+  background:#dcebdc;
+  color:#253138;
+
+  border-radius:28px;
+  padding:38px;
+
+  box-shadow:0 12px 30px rgba(37,49,56,.06);
+}
+
+.character-feature h2{
+  max-width:620px;
+  margin:8px 0 12px;
+}
+
+.character-feature p{
+  max-width:620px;
+  color:#536367;
+  line-height:1.65;
+}
+
+.character-feature .button{
+  margin-top:8px;
+}
+
+.character-feature .doodle{
+  position:absolute;
+  right:34px;
+  bottom:22px;
+
+  font-size:4rem;
+  line-height:1;
+
+  transform:rotate(-6deg);
+}
+
+
+/* Mobile */
+
+@media(max-width:650px){
+
+  .character-feature{
+    padding:30px 24px;
+  }
+
+  .character-feature .doodle{
+    right:20px;
+    bottom:16px;
+    font-size:3rem;
+  }
+
+}
+/* =========================================================
+   HOMEPAGE — BUNDLES FEATURE TILE
+========================================================= */
+
+.bundle-feature{
+  position:relative;
+  overflow:hidden;
+
+  background:#f3e2c8;
+  color:#253138;
+
+  border-radius:28px;
+  padding:38px;
+
+  box-shadow:0 12px 30px rgba(37,49,56,.06);
+}
+
+.bundle-feature h2{
+  max-width:620px;
+  margin:8px 0 12px;
+}
+
+.bundle-feature p{
+  max-width:620px;
+  color:#536367;
+  line-height:1.65;
+}
+
+.bundle-feature .button{
+  margin-top:8px;
+}
+
+.bundle-feature .doodle{
+  position:absolute;
+  right:34px;
+  bottom:22px;
+
+  font-size:4rem;
+  line-height:1;
+
+  transform:rotate(6deg);
+}
+
+
+/* Mobile */
+
+@media(max-width:650px){
+
+  .bundle-feature{
+    padding:30px 24px;
+  }
+
+  .bundle-feature .doodle{
+    right:20px;
+    bottom:16px;
+    font-size:3rem;
+  }
+
+}
+/* Make the Characters + Bundles doodles visually match */
+.character-feature .doodle,
+.bundle-feature .doodle{
+  font-size:6rem;
+  line-height:1;
 }
