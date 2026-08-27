@@ -90,7 +90,84 @@
     </aside>
     <div class="overlay" id="overlay"></div>
     <dialog id="searchDialog"><div class="dialog-head"><h2>Find a story</h2><button class="close" data-close="searchDialog">×</button></div><input id="searchInput" class="search-input" placeholder="Try 'animals', 'magic', or a title…" autofocus /><div id="searchResults" class="search-results"></div></dialog>
-    <dialog id="checkoutDialog"><div class="dialog-head"><h2>Checkout</h2><button class="close" data-close="checkoutDialog">×</button></div><p class="muted">This is a payment-ready checkout layout. Payments are intentionally not connected in this offline demo.</p><form id="checkoutForm" class="checkout-form"><label>Name<input required placeholder="Your name" /></label><label>Email<input required type="email" placeholder="you@example.com" /></label><label>Delivery address<textarea required placeholder="House / street / city / PIN"></textarea></label><div class="payment-box"><span>🔒</span><div><b>Payment setup needed</b><p>Connect Razorpay, Stripe, or another provider before accepting payment.</p></div></div><button class="button button-dark" type="submit">Save order details</button></form><p id="checkoutNotice" class="form-notice"></p></dialog>
+<dialog id="checkoutDialog">
+
+  <div class="dialog-head">
+    <h2>Checkout</h2>
+    <button class="close" data-close="checkoutDialog">×</button>
+  </div>
+
+  <p class="muted">
+    Enter your details below to continue to secure payment.
+  </p>
+
+<form id="checkoutForm" class="checkout-form">
+
+  <label>
+    Name
+    <input
+      name="name"
+      required
+      placeholder="Your name"
+      autocomplete="name"
+    />
+  </label>
+
+  <label>
+    Phone / WhatsApp number
+    <input
+      name="phone"
+      required
+      type="tel"
+      inputmode="numeric"
+      autocomplete="tel"
+      placeholder="10-digit mobile number"
+    />
+  </label>
+
+  <label>
+    Email <span class="muted">(optional)</span>
+    <input
+      name="email"
+      type="email"
+      placeholder="you@example.com"
+      autocomplete="email"
+    />
+  </label>
+
+  <label>
+    Delivery address
+    <textarea
+      name="address"
+      required
+      placeholder="House / street / city / PIN"
+      autocomplete="street-address"
+    ></textarea>
+  </label>
+
+  <div class="payment-box">
+    <span>🔒</span>
+
+    <div>
+      <b>Secure payment</b>
+      <p>
+        You'll be redirected to Razorpay to complete your payment.
+      </p>
+    </div>
+  </div>
+
+  <button
+    class="button button-dark"
+    type="submit"
+  >
+    Pay securely
+  </button>
+
+</form>
+
+<p id="checkoutNotice" class="form-notice"></p>
+
+</dialog>
     <dialog id="bookDialog"></dialog>
 
 

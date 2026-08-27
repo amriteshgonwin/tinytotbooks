@@ -495,7 +495,7 @@ function renderMonthly(){
     ${pageHero(
       'August reading box',
       'The Little Reader’s Club',
-      'A lovely little ritual: three unforgettable stories, chosen for curious readers aged 4–7.'
+      'A lovely little ritual : Your monthly box of little books. Discover great deals below.'
     )}
 
     <section class="section">
@@ -838,73 +838,417 @@ function renderReviews(){
 }
 
 function renderAbout(){
+
   app.innerHTML=`
+
     ${pageHero(
       'Our story',
-      'A bookshop for the wonderfully curious.',
-      'TinyTotBooks began with a simple belief: every child deserves books that feel like a little door opening.'
+      'A little idea that began with a love for books.',
+      'TinyTotBooks started with a simple wish — to help more children discover wonderful stories without the wonderful price tag.'
     )}
 
-    <section class="section">
-      <div class="about-grid">
-        <div>
-          <h2>Small shop. Big imagination.</h2>
-          <p>We’re a tiny, independent children’s bookshop with an enormous soft spot for picture books, peculiar characters, brave feelings and stories that make children look up and say, “Again!”</p>
-          <p>Our shelf is deliberately small — so every book earns its place.</p>
+    <section class="story-page">
+
+      <!-- =================================================
+           01 — THE BEGINNING
+           ================================================= -->
+
+      <section class="story-chapter story-paper story-opening">
+
+        <div class="story-inner story-opening-grid">
+
+          <div>
+
+            <span class="story-marker">01 / The beginning</span>
+
+            <h2>
+              Sometimes the best ideas begin with something very simple.
+            </h2>
+
+            <p class="story-opening-lead">
+              TinyTotBooks started in 2021, when my second child was born.
+            </p>
+
+            <p>
+              Being a pediatrician and a mom, I wanted my children to grow
+              up surrounded by beautiful books, wonderful stories and little
+              worlds that could spark their imagination — just like any
+              parent would.
+            </p>
+
+          </div>
+
+          <div class="story-year" aria-label="Started in 2021">
+            2021
+          </div>
+
         </div>
 
-        <div class="about-card">
-          <span style="font-size:4rem">🌱</span>
-          <h2>Our promise</h2>
-          <p>We choose stories with warmth, wonder and room for young minds to grow. No clutter, no endless scrolling — just genuinely great books.</p>
-        </div>
-      </div>
-    </section>
-  `;
-}
+      </section>
 
-function renderCollabs(){
-  app.innerHTML=`
-    ${pageHero(
-      'Let’s create together',
-      'TinyTotBooks loves a good collaboration.',
-      'Are you a creator, school, brand, illustrator, storyteller, or simply someone who loves children’s books? We’d love to hear from you.'
-    )}
 
-    <section class="section">
-      <div class="about-grid">
-        <div>
-          <span class="eyebrow">Collab with us</span>
-          <h2>Let’s make something lovely.</h2>
-          <p>
-            We’re always open to thoughtful collaborations that bring
-            wonderful books and ideas to more little readers.
+      <!-- =================================================
+           02 — THE SEARCH
+           ================================================= -->
+
+      <section class="story-chapter story-cream story-idea">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">02 / The search</span>
+
+          <h2>
+            Then came the hunt for books.
+          </h2>
+
+          <p class="story-idea-copy">
+            While searching for books for my children, I found myself drawn
+            to imported books and titles by authors from around the world.
+            They were beautiful, engaging and often very different from the
+            books I had grown up with.
           </p>
+
+          <p class="story-idea-copy">
+            But I soon realised that many of them were quite expensive,
+            especially for a middle-class family.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           03 — THE QUESTION
+           ================================================= -->
+
+      <section class="story-chapter story-question">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">03 / The question</span>
+
+          <h2>
+            “Why should beautiful, good-quality books have to be so expensive?”
+          </h2>
+
           <p>
-            Tell us a little about yourself, what you have in mind,
-            and how you think we could work together.
+            That question stayed with me.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           04 — PRE-LOVED BOOKS
+           ================================================= -->
+
+      <section class="story-chapter story-mint story-journey">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">04 / A new idea</span>
+
+          <h2>
+            That was when I discovered the world of pre-loved books.
+          </h2>
+
+          <p class="story-journey-intro">
+            I loved the idea that a book could be loved by one child and
+            then continue its journey to another.
+          </p>
+
+
+          <div class="story-flow" aria-hidden="true">
+
+            <div class="story-flow-book">
+              📖
+            </div>
+
+            <div class="story-flow-arrow">
+              →
+            </div>
+
+            <div class="story-flow-book">
+              🧒
+            </div>
+
+          </div>
+
+
+          <p class="story-journey-note">
+            A book didn't have to stop being special just because it had
+            already belonged to someone.
+          </p>
+
+          <p class="story-journey-note">
+            And that little thought slowly became TinyTotBooks.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           05 — OUR WISH
+           ================================================= -->
+
+      <section class="story-chapter story-wish">
+
+        <div class="story-inner story-center">
+
+          <p class="story-wish-text">
+            Our wish is simple — to make wonderful children's books more
+            accessible and affordable, so that more children can discover
+            the joy of reading.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           06 — CURATION
+           ================================================= -->
+
+      <section class="story-chapter story-paper">
+
+        <div class="story-inner">
+
+          <div class="story-curation-header">
+
+            <span class="story-marker">06 / What we choose</span>
+
+            <h2>
+              Every book here is handpicked.
+            </h2>
+
+            <p>
+              We choose each one with the same care we would use while
+              picking a book for our own children.
+            </p>
+
+          </div>
+
+
+          <div class="story-curation">
+
+            <article class="story-curation-item">
+
+              <span class="story-curation-number">01</span>
+
+              <h3>
+                Beautiful stories
+              </h3>
+
+              <p>
+                Writing with warmth, humour and heart.
+              </p>
+
+            </article>
+
+
+            <article class="story-curation-item">
+
+              <span class="story-curation-number">02</span>
+
+              <h3>
+                Engaging illustrations
+              </h3>
+
+              <p>
+                Art that makes a child want to stop, look and explore.
+              </p>
+
+            </article>
+
+
+            <article class="story-curation-item">
+
+              <span class="story-curation-number">03</span>
+
+              <h3>
+                Books worth keeping
+              </h3>
+
+              <p>
+                Stories that can become favourites and earn a place
+                on the shelf.
+              </p>
+
+            </article>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           07 — INVITATION
+           ================================================= -->
+
+      <section class="story-chapter story-blush story-invitation">
+
+        <div class="story-inner story-center">
+
+          <div class="story-divider">
+            <span></span>
+          </div>
+
+          <span
+            class="story-marker"
+            style="margin-top:28px"
+          >
+            07 / Your turn
+          </span>
+
+          <h2>
+            So, take a little peek around.
+          </h2>
+
+          <p>
+            You might find a story you've been looking for, a beautiful
+            book you didn't know existed, or perhaps your child's next
+            favourite.
+          </p>
+
+          <p>
+            From treasured classics to hidden gems from around the world,
+            there's always something waiting to be discovered.
           </p>
 
           <a
             class="button button-dark"
-            href="YOUR_GOOGLE_FORM_LINK_HERE"
-            target="_blank"
-            rel="noopener"
+            href="#books"
           >
-            Apply to collaborate
+            Browse the bookshelf
           </a>
+
         </div>
 
-        <div class="about-card">
-          <span style="font-size:4rem">🤝</span>
-          <h2>Who can collaborate?</h2>
-          <p>Creators · Schools · Brands · Illustrators · Authors · Book lovers</p>
+      </section>
+
+
+      <!-- =================================================
+           08 — REVIEWS TRANSITION
+           ================================================= -->
+
+      <section class="story-chapter story-review-transition">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">
+            08 / And then...
+          </span>
+
+          <h2>
+            Of course, we'd love to tell you how lovely TinyTotBooks is.
+          </h2>
+
+          <p>
+            But it's much nicer when someone else says it.
+          </p>
+
         </div>
-      </div>
+
+      </section>
+
+
+      <!-- =================================================
+           09 — PRESENT DAY
+           ================================================= -->
+
+      <section class="story-chapter story-paper story-present">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">
+            09 / Today
+          </span>
+
+          <h2>
+            A little box of possibilities.
+          </h2>
+
+          <p>
+            We hope every parcel from TinyTotBooks feels like opening
+            a little box of possibilities — a new story, a new adventure,
+            and a new reason to read together.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           10 — ENDING
+           ================================================= -->
+
+      <section class="story-chapter story-finale">
+
+        <div class="story-inner story-center">
+
+          <span class="story-marker">
+            10 / The next chapter
+          </span>
+
+          <p class="story-finale-text">
+            Come find a book.<br>
+            Give it a new home.<br>
+            Let its next little adventure begin.
+          </p>
+
+          <p class="story-finale-sub">
+            ❤️📚
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- =================================================
+           REVIEWS CTA
+           ================================================= -->
+
+      <section class="story-review-cta">
+
+        <div class="story-review-copy">
+
+          <span class="eyebrow">
+            Want to see more?
+          </span>
+
+          <h2>
+            Hear from the families who've been here.
+          </h2>
+
+          <p>
+            More real experiences from TinyTotBooks families are waiting
+            for you on our reviews page.
+          </p>
+
+        </div>
+
+        <a
+          class="button"
+          href="#reviews"
+        >
+          Read our reviews →
+        </a>
+
+      </section>
+
     </section>
   `;
 }
-
 function renderBulk(){
   app.innerHTML=`
     ${pageHero(
@@ -1355,7 +1699,47 @@ function renderAdmin(){
     </section>
   `;
 }
+function renderCollabs(){
+  app.innerHTML=`
+    ${pageHero(
+      'Let’s create together',
+      'TinyTotBooks loves a good collaboration.',
+      'Are you a creator, school, brand, illustrator, storyteller, or simply someone who loves children’s books? We’d love to hear from you.'
+    )}
 
+    <section class="section">
+      <div class="about-grid">
+        <div>
+          <span class="eyebrow">Collab with us</span>
+          <h2>Let’s make something lovely.</h2>
+          <p>
+            We’re always open to thoughtful collaborations that bring
+            wonderful books and ideas to more little readers.
+          </p>
+          <p>
+            Tell us a little about yourself, what you have in mind,
+            and how you think we could work together.
+          </p>
+
+          <a
+            class="button button-dark"
+            href="YOUR_GOOGLE_FORM_LINK_HERE"
+            target="_blank"
+            rel="noopener"
+          >
+            Apply to collaborate
+          </a>
+        </div>
+
+        <div class="about-card">
+          <span style="font-size:4rem">🤝</span>
+          <h2>Who can collaborate?</h2>
+          <p>Creators · Schools · Brands · Illustrators · Authors · Book lovers</p>
+        </div>
+      </div>
+    </section>
+  `;
+}
 function route(){
 
   const parts = location.hash.slice(1).split('/');
@@ -2011,11 +2395,281 @@ document.querySelector('#checkoutButton').onclick=()=>{
   checkoutDialog.showModal();
 };
 
-document.querySelector('#checkoutForm').onsubmit=e=>{
+document.querySelector('#checkoutForm').onsubmit = async e => {
   e.preventDefault();
 
-  checkoutNotice.textContent=
-    'Your details are saved only in this browser demo. No order or payment was placed.';
+  if (!state.cart.length) return;
+
+  const form = e.currentTarget;
+  const formData = new FormData(form);
+
+  const name = (formData.get('name') || '').trim();
+  const phone = (formData.get('phone') || '').trim();
+  const email = (formData.get('email') || '').trim();
+  const address = (formData.get('address') || '').trim();
+
+  /*
+   * Name, phone and delivery address are mandatory.
+   * Email is optional.
+   */
+  if (!name || !phone || !address) {
+    checkoutNotice.textContent =
+      'Please fill in your name, phone number and delivery address.';
+    return;
+  }
+
+  checkoutNotice.textContent = 'Preparing secure payment…';
+
+  try {
+
+    /* Load Razorpay Checkout */
+    if (!window.Razorpay) {
+      await new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+
+        script.src =
+          'https://checkout.razorpay.com/v1/checkout.js';
+
+        script.onload = resolve;
+        script.onerror = reject;
+
+        document.head.appendChild(script);
+      });
+    }
+
+    /*
+     * Send ONLY product IDs + quantities to our server.
+     *
+     * The server gets the real prices from Supabase.
+     * The browser is NOT trusted for prices.
+     */
+    const response = await fetch(
+      'https://xzwkombhtesozqobldvu.supabase.co/functions/v1/create-razorpay-order',
+      {
+        method: 'POST',
+
+        headers: {
+          'Content-Type': 'application/json'
+        },
+
+body: JSON.stringify({
+  customer: {
+    name,
+    phone: formData.get('phone').trim(),
+    email: email || null,
+    address
+  },
+
+  cart: state.cart.map(item => ({
+    id: item.id,
+    qty: item.qty
+  }))
+})
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(
+        data.error || 'Could not create payment order.'
+      );
+    }
+
+    checkoutNotice.textContent = '';
+
+    const options = {
+
+      key: data.key_id,
+
+      amount: data.amount,
+
+      currency: data.currency,
+
+      name: 'TinyTotBooks',
+
+      description: 'Your TinyTotBooks order',
+
+      order_id: data.razorpay_order_id,
+
+      prefill: {
+        name,
+        email: email || undefined,
+        contact: phone
+      },
+
+      notes: {
+        customer_name: name,
+        customer_phone: phone,
+        customer_email: email || '',
+        shipping_address: address
+      },
+
+      theme: {
+        color: '#26343b'
+      },
+
+      /*
+       * Razorpay calls this ONLY after successful payment.
+       */
+      handler: async function(paymentResponse) {
+
+        console.log(
+          'Razorpay payment response:',
+          paymentResponse
+        );
+
+        checkoutNotice.textContent =
+          'Payment received. Verifying securely…';
+
+        try {
+
+          /*
+           * IMPORTANT:
+           *
+           * The browser does NOT decide whether payment succeeded.
+           *
+           * These payment details go to our Supabase Edge Function,
+           * where the Razorpay signature is verified server-side.
+           */
+          const verifyResponse = await fetch(
+            'https://xzwkombhtesozqobldvu.supabase.co/functions/v1/verify-razorpay-payment',
+            {
+              method: 'POST',
+
+              headers: {
+                'Content-Type': 'application/json'
+              },
+
+              body: JSON.stringify({
+
+                razorpay_order_id:
+                  paymentResponse.razorpay_order_id,
+
+                razorpay_payment_id:
+                  paymentResponse.razorpay_payment_id,
+
+                razorpay_signature:
+                  paymentResponse.razorpay_signature,
+
+                customer: {
+                  name,
+                  phone,
+                  email: email || null,
+                  address
+                },
+
+cart: state.cart.map(item => ({
+  id: item.id,
+  qty: item.qty
+}))
+              })
+            }
+          );
+
+          const verifyData =
+            await verifyResponse.json();
+
+          if (
+            !verifyResponse.ok ||
+            !verifyData.success
+          ) {
+            throw new Error(
+              verifyData.error ||
+              'Payment verification failed.'
+            );
+          }
+
+          /*
+           * Payment has now been verified by the server.
+           *
+           * Only NOW do we consider the order successful.
+           */
+          checkoutNotice.textContent =
+            'Order confirmed! Thank you for shopping with TinyTotBooks.';
+
+          /*
+           * Clear the cart only after successful
+           * server-side payment verification.
+           */
+          state.cart = [];
+
+          save();
+          renderCart();
+
+          form.reset();
+
+          /*
+           * Give the user a moment to see the confirmation.
+           */
+          setTimeout(() => {
+            checkoutDialog.close();
+          }, 2500);
+
+          console.log(
+            'Verified TinyTotBooks order:',
+            verifyData
+          );
+
+        } catch (verificationError) {
+
+          console.error(
+            'Payment verification error:',
+            verificationError
+          );
+
+          /*
+           * IMPORTANT:
+           *
+           * We DO NOT clear the cart here.
+           * We DO NOT tell the user the order succeeded.
+           */
+          checkoutNotice.textContent =
+            verificationError.message ||
+            'Payment was received but could not be verified. Please contact us before trying again.';
+        }
+      },
+
+      modal: {
+        ondismiss: function() {
+
+          checkoutNotice.textContent =
+            'Payment window closed. Your order has not been placed.';
+        }
+      }
+    };
+
+    const razorpay =
+      new Razorpay(options);
+
+    razorpay.on(
+      'payment.failed',
+      function(response) {
+
+        console.error(
+          'Razorpay payment failed:',
+          response
+        );
+
+        checkoutNotice.textContent =
+          'Payment failed or was cancelled. No order was placed.';
+      }
+    );
+
+checkoutDialog.close();
+razorpay.open();
+
+  } catch (error) {
+
+    console.error(
+      'Checkout error:',
+      error
+    );
+
+    checkoutNotice.textContent =
+      error.message ||
+      'Something went wrong while starting payment.';
+  }
 };
 
 document.addEventListener('click',e=>{
