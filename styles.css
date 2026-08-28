@@ -3437,3 +3437,59 @@ footer h4{
     transform:none !important;
   }
 }
+
+/* =========================================================
+   CART — fixed checkout summary at top
+   ========================================================= */
+
+.cart-summary-top {
+  padding: 12px 20px 16px;
+  background: var(--cream);
+  border-bottom: 1px solid rgba(0,0,0,.1);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.cart-summary-top #shippingMessage {
+  margin: 0 0 10px;
+  font-size: .9rem;
+}
+
+.cart-summary-top .total-row {
+  margin: 5px 0;
+}
+
+.cart-summary-top .cart-grand-total {
+  font-size: 1.08em;
+  padding-top: 9px;
+  margin-top: 8px;
+  border-top: 1px solid rgba(0,0,0,.1);
+}
+
+.cart-summary-top #checkoutButton {
+  width: 100%;
+  margin-top: 12px;
+}
+/* =========================================================
+   CART — make the book list independently scrollable
+   ========================================================= */
+
+.cart-drawer {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.cart-summary-top {
+  flex-shrink: 0;
+}
+
+#cartItems {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 20px;
+}
