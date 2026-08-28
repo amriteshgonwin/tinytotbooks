@@ -69,6 +69,81 @@ const state={
 
 };
 
+async function renderShipping(){
+
+  app.innerHTML = `
+    <section class="shipping-page">
+
+      <div class="shipping-hero">
+        <span class="eyebrow">Shipping & Delivery</span>
+
+        <h1>
+          A little journey<br>
+          from our shelf to yours.
+        </h1>
+
+        <p>
+          Everything you need to know about getting your TinyTotBooks
+          safely home.
+        </p>
+      </div>
+
+      <div class="shipping-content" id="shippingContent">
+        <p class="shipping-loading">
+          Loading shipping information…
+        </p>
+      </div>
+
+    </section>
+  `;
+
+  const {
+    data,
+    error
+  } = await supabase
+    .from('shipping_info')
+    .select('content')
+    .eq('active', true)
+    .order('updated_at', { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  const content = document.querySelector('#shippingContent');
+
+  if(error){
+    console.error('Shipping information error:', error);
+
+    content.innerHTML = `
+      <p class="shipping-error">
+        We couldn't load our shipping information right now.
+      </p>
+    `;
+
+    return;
+  }
+
+  if(!data){
+    content.innerHTML = `
+      <p class="shipping-error">
+        Shipping information is currently unavailable.
+      </p>
+    `;
+
+    return;
+  }
+
+  /*
+   * Convert paragraphs separated by blank lines
+   * into proper readable paragraphs.
+   */
+  content.innerHTML = data.content
+    .split(/\n\s*\n/)
+    .map(paragraph => `
+      <p>${esc(paragraph.trim())}</p>
+    `)
+    .join('');
+}
+
 async function loadBooksFromSupabase() {
   const { data, error } = await supabase
     .from('books')
@@ -570,6 +645,116 @@ function renderMonthly(){
 
     </section>
   `;
+}
+
+async function renderFAQs() {
+  const app = document.querySelector('#app');
+
+  app.innerHTML = `
+    <section class="faq-page">
+      <div class="faq-hero">
+        <p class="eyebrow">Questions, answered</p>
+        <h1>Frequently Asked Questions</h1>
+        <p>
+          A few little answers to the things you might be wondering.
+        </p>
+      </div>
+
+      <div class="faq-list" id="faqList">
+        <p class="faq-loading">Loading FAQs…</p>
+      </div>
+    </section>
+  `;
+
+  const {
+    data: faqs,
+    error
+  } = await supabase
+    .from('faqs')
+    .select('id,question,answer')
+    .eq('active', true)
+    .order('sort_order', { ascending: true });
+
+  const faqList = document.querySelector('#faqList');
+
+  if (error) {
+    console.error('FAQ loading error:', error);
+
+    faqList.innerHTML = `
+      <p class="faq-error">
+        We couldn't load the FAQs right now. Please try again.
+      </p>
+    `;
+
+    return;
+  }
+
+  if (!faqs || faqs.length === 0) {
+    faqList.innerHTML = `
+      <p class="faq-error">
+        No FAQs are available right now.
+      </p>
+    `;
+
+    return;
+  }
+
+  faqList.innerHTML = faqs.map(faq => `
+    <article class="faq-card">
+      <button
+        class="faq-question"
+        type="button"
+        aria-expanded="false"
+      >
+        <span>${esc(faq.question)}</span>
+        <span class="faq-plus">+</span>
+      </button>
+
+      <div class="faq-answer">
+        <p>${esc(faq.answer)}</p>
+      </div>
+    </article>
+  `).join('');
+
+  faqList.querySelectorAll('.faq-question').forEach(button => {
+
+    button.addEventListener('click', () => {
+
+      const card = button.closest('.faq-card');
+      const isOpen =
+        card.classList.contains('open');
+
+      /*
+       * Close other questions.
+       */
+      faqList.querySelectorAll('.faq-card.open')
+        .forEach(openCard => {
+          openCard.classList.remove('open');
+
+          const openButton =
+            openCard.querySelector('.faq-question');
+
+          openButton.setAttribute(
+            'aria-expanded',
+            'false'
+          );
+        });
+
+      /*
+       * Open this question.
+       */
+      if (!isOpen) {
+        card.classList.add('open');
+
+        button.setAttribute(
+          'aria-expanded',
+          'true'
+        );
+      }
+
+    });
+
+  });
 }
 
 function renderBundles(){
@@ -1767,7 +1952,9 @@ const pages={
   about:renderAbout,
   collabs:renderCollabs,
   bulk:renderBulk,
-  reviews:renderReviews
+  reviews:renderReviews,
+  shipping:renderShipping,
+  faqs:renderFAQs
 };
     (pages[view]||renderHome)();
 
@@ -3046,3 +3233,21 @@ async function initializeApp() {
 }
 
 initializeApp();
+
+/* =========================================================
+   PREVENT BROWSER FROM RESTORING OLD SCROLL POSITION
+   ========================================================= */
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
+}
+
+window.scrollTo(0, 0);
+
+window.addEventListener('hashchange', () => {
+  window.scrollTo(0, 0);
+
+  setTimeout(() => {
+    window.scrollTo(0, 0);
+  }, 50);
+});
