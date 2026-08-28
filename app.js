@@ -538,8 +538,8 @@ function renderMonthly(){
 
                   <button
                     class="button button-dark"
-                    onclick="addBundle([${(p.book_ids || []).join(',')}])"
-                  >
+                    onclick="addMonthlyPick(${p.id})"
+                    >
                     ${esc(p.button_text || 'Add this box')}
                   </button>
 
@@ -632,8 +632,8 @@ function renderBundles(){
 
                     <button
                       class="button button-dark"
-                      onclick="addBundle([${(b.book_ids || []).join(',')}])"
-                    >
+                    onclick="addBundle(${b.id})"
+                      >
                       ${esc(b.button_text || 'Add bundle')}
                     </button>
 
@@ -1791,19 +1791,73 @@ function addToCart(id){
   openCart();
 }
 
-function addBundle(ids){
-  ids.forEach(addToCart);
+function addBundle(id){
+  const bundle = state.bundles.find(
+    b => Number(b.id) === Number(id)
+  );
+
+  if(!bundle || !bundle.active) return;
+
+  const line = state.cart.find(
+    x => x.type === 'bundle' &&
+         Number(x.id) === Number(id)
+  );
+
+  line
+    ? line.qty++
+    : state.cart.push({
+        type: 'bundle',
+        id: Number(id),
+        qty: 1
+      });
+
+  save();
   openCart();
 }
 
-function changeQty(id,d){
-  const item=state.cart.find(x=>x.id===id);
-  if(!item)return;
+function addMonthlyPick(id){
+  const pick = state.monthlyPicks.find(
+    p => Number(p.id) === Number(id)
+  );
 
-  item.qty+=d;
+  if(!pick || !pick.active) return;
 
-  if(item.qty<=0){
-    state.cart=state.cart.filter(x=>x.id!==id);
+  const line = state.cart.find(
+    x => x.type === 'monthly' &&
+         Number(x.id) === Number(id)
+  );
+
+  line
+    ? line.qty++
+    : state.cart.push({
+        type: 'monthly',
+        id: Number(id),
+        qty: 1
+      });
+
+  save();
+  openCart();
+}
+
+function changeQty(type,id,d){
+  const item = state.cart.find(
+    x =>
+      (x.type || 'book') === type &&
+      Number(x.id) === Number(id)
+  );
+
+  if(!item) return;
+
+  item.qty += d;
+
+  if(item.qty <= 0){
+    state.cart = state.cart.filter(
+      x =>
+        !(
+          (x.type || 'book') === type &&
+          Number(x.id) === Number(id)
+        )
+    );
   }
 
   save();
@@ -1816,137 +1870,291 @@ function updateCartBadge(){
 }
 
 function renderCart(){
-  const lines=state.cart
-    .map(x=>({
-      book:state.books.find(b=>b.id===x.id),
-      qty:x.qty
-    }))
-    .filter(x=>x.book);
+
+  const lines = state.cart
+    .map(item => {
+
+      const type = item.type || 'book';
+
+      if(type === 'bundle'){
+        const bundle = state.bundles.find(
+          b => Number(b.id) === Number(item.id)
+        );
+
+        if(!bundle) return null;
+
+        return {
+          type,
+          product: bundle,
+          qty: item.qty
+        };
+      }
+
+      if(type === 'monthly'){
+        const pick = state.monthlyPicks.find(
+          p => Number(p.id) === Number(item.id)
+        );
+
+        if(!pick) return null;
+
+        return {
+          type,
+          product: pick,
+          qty: item.qty
+        };
+      }
+
+      const book = state.books.find(
+        b => Number(b.id) === Number(item.id)
+      );
+
+      if(!book) return null;
+
+      return {
+        type: 'book',
+        product: book,
+        qty: item.qty
+      };
+
+    })
+    .filter(Boolean);
+
 
   /*
-   * SUBTOTAL = BOOKS ONLY
+   * BOOK / BUNDLE / MONTHLY SUBTOTAL
    */
-  const subtotal=lines.reduce(
-    (n,x)=>n+x.book.price*x.qty,
+  const subtotal = lines.reduce(
+    (n,line) =>
+      n + Number(line.product.price || 0) * line.qty,
     0
   );
 
+
   /*
-   * Render the books immediately.
+   * Render cart items
    */
-  document.querySelector('#cartItems').innerHTML=
+  document.querySelector('#cartItems').innerHTML =
     lines.length
-      ? lines.map(({book,qty})=>`
-          <div class="cart-line">
-            ${cover(book,true)}
+      ? lines.map(line => {
 
-            <div class="line-info">
-              <h3>${esc(book.title)}</h3>
-              <p>${money(book.price)}</p>
+          const {type,product,qty} = line;
 
-              <div class="qty">
-                <button onclick="changeQty(${book.id},-1)">−</button>
-                <b>${qty}</b>
-                <button onclick="changeQty(${book.id},1)">+</button>
+          const isBook = type === 'book';
+
+          const productTitle =
+            product.title || 'Item';
+
+          const productPrice =
+            Number(product.price || 0);
+
+          let visual = '';
+
+          if(isBook){
+
+            visual = `
+              <div
+                onclick="closeCart();openBook(${product.id})"
+                style="cursor:pointer"
+                title="View book details"
+              >
+                ${cover(product,true)}
               </div>
-            </div>
+            `;
 
-            <strong>${money(book.price*qty)}</strong>
-          </div>
-        `).join('')
+          }else{
+
+            visual = `
+              <div
+                class="cart-cover"
+                style="
+                  background:${
+                    product.artwork_color ||
+                    product.color ||
+                    '#f7bdd0'
+                  };
+                  display:flex;
+                  align-items:center;
+                  justify-content:center;
+                  font-size:2rem;
+                  cursor:default;
+                "
+              >
+                ${esc(
+                  product.artwork ||
+                  product.icon ||
+                  '🎁'
+                )}
+              </div>
+            `;
+
+          }
+
+
+          return `
+            <div class="cart-line">
+
+              ${visual}
+
+              <div class="line-info">
+
+                <h3>
+                  ${esc(productTitle)}
+                </h3>
+
+                <p>
+                  ${money(productPrice)}
+                </p>
+
+                ${
+                  type === 'bundle'
+                    ? `<small class="muted">Bundle</small>`
+                    : ''
+                }
+
+                ${
+                  type === 'monthly'
+                    ? `<small class="muted">Monthly pick</small>`
+                    : ''
+                }
+
+                <div class="qty">
+
+                  <button
+                    onclick="changeQty(
+                      '${type}',
+                      ${product.id},
+                      -1
+                    )"
+                  >
+                    −
+                  </button>
+
+                  <b>${qty}</b>
+
+                  <button
+                    onclick="changeQty(
+                      '${type}',
+                      ${product.id},
+                      1
+                    )"
+                  >
+                    +
+                  </button>
+
+                </div>
+
+              </div>
+
+              <strong>
+                ${money(productPrice * qty)}
+              </strong>
+
+            </div>
+          `;
+
+        }).join('')
+
       : '<p class="empty">Your bag is waiting for its first story.</p>';
 
-  /*
-   * Always show the REAL BOOK SUBTOTAL immediately.
-   */
-  document.querySelector('#cartSubtotal').textContent=
-    money(subtotal);
 
   /*
-   * Empty cart.
+   * BOOK / BUNDLE / MONTHLY SUBTOTAL
    */
-  if(subtotal===0){
-    document.querySelector('#cartShipping').textContent='₹0';
-    document.querySelector('#cartTotal').textContent='₹0';
-    document.querySelector('#shippingMessage').textContent=
+  document.querySelector('#cartSubtotal').textContent =
+    money(subtotal);
+
+
+  /*
+   * Empty cart
+   */
+  if(subtotal === 0){
+
+    document.querySelector('#cartShipping').textContent =
+      '₹0';
+
+    document.querySelector('#cartTotal').textContent =
+      '₹0';
+
+    document.querySelector('#shippingMessage').textContent =
       'Add a story to get started.';
+
     return;
   }
 
+
   /*
-   * FREE SHIPPING once subtotal reaches the existing
-   * ₹799 threshold (state.shipping).
+   * FREE SHIPPING AT ₹799
    */
-  if(subtotal>=state.shipping){
-    document.querySelector('#cartShipping').textContent='Free';
-    document.querySelector('#cartTotal').textContent=
+  if(subtotal >= state.shipping){
+
+    document.querySelector('#cartShipping').textContent =
+      'Free';
+
+    document.querySelector('#cartTotal').textContent =
       money(subtotal);
 
-    document.querySelector('#shippingMessage').textContent=
+    document.querySelector('#shippingMessage').textContent =
       'You’ve unlocked free delivery! 🎉';
 
     return;
   }
 
+
   /*
-   * Below ₹799:
-   *
-   * Get the ACTUAL shipping charge from Supabase.
+   * BELOW ₹799:
+   * Read actual shipping charge from Supabase.
    */
   supabase
     .from('site_settings')
     .select('value')
     .eq('key','shipping_charge')
     .maybeSingle()
-    .then(({data,error})=>{
 
-      let shippingCharge=70;
+    .then(({data,error}) => {
+
+      let shippingCharge = 0;
 
       if(!error && data){
-        const parsed=Number(data.value);
 
-        if(Number.isFinite(parsed) && parsed>=0){
-          shippingCharge=parsed;
+        const parsed =
+          Number(data.value);
+
+        if(
+          Number.isFinite(parsed) &&
+          parsed >= 0
+        ){
+          shippingCharge = parsed;
         }
+
       }
 
-      /*
-       * Shipping = Supabase setting.
-       */
-      document.querySelector('#cartShipping').textContent=
+      document.querySelector('#cartShipping').textContent =
         money(shippingCharge);
 
-      /*
-       * Total = books + shipping.
-       */
-      document.querySelector('#cartTotal').textContent=
-        money(subtotal+shippingCharge);
+      document.querySelector('#cartTotal').textContent =
+        money(subtotal + shippingCharge);
 
-      /*
-       * Free-delivery progress.
-       */
-      document.querySelector('#shippingMessage').textContent=
+      document.querySelector('#shippingMessage').textContent =
         `Add ${money(state.shipping-subtotal)} more for free delivery.`;
+
     })
-    .catch(error=>{
+
+    .catch(error => {
+
       console.error(
         'Unable to load shipping charge:',
         error
       );
 
-      /*
-       * Safe fallback if Supabase is temporarily unavailable.
-       */
-      const shippingCharge=70;
+      document.querySelector('#cartShipping').textContent =
+        '—';
 
-      document.querySelector('#cartShipping').textContent=
-        money(shippingCharge);
+      document.querySelector('#cartTotal').textContent =
+        '—';
 
-      document.querySelector('#cartTotal').textContent=
-        money(subtotal+shippingCharge);
+      document.querySelector('#shippingMessage').textContent =
+        'Unable to calculate delivery charge. Please try again.';
 
-      document.querySelector('#shippingMessage').textContent=
-        `Add ${money(state.shipping-subtotal)} more for free delivery.`;
     });
 }
 
@@ -2550,10 +2758,11 @@ body: JSON.stringify({
     address
   },
 
-  cart: state.cart.map(item => ({
-    id: item.id,
-    qty: item.qty
-  }))
+cart: state.cart.map(item => ({
+  type: item.type || 'book',
+  id: item.id,
+  qty: item.qty
+}))
 })
       }
     );
@@ -2653,7 +2862,8 @@ const orderCart = state.cart.map(item => ({
                 },
 
 items: state.cart.map(item => ({
-  book_id: item.id,
+  type: item.type || 'book',
+  id: item.id,
   qty: item.qty
 }))
               })
