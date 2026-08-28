@@ -3882,3 +3882,62 @@ footer h4{
   }
 
 }
+
+/* =========================================================
+   MOBILE PERFORMANCE PATCH
+   Keeps the site smooth on phones
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+  /* Reduce expensive visual effects */
+  *,
+  *::before,
+  *::after {
+    animation-duration: .2s !important;
+    transition-duration: .2s !important;
+  }
+
+  /* Stop hover animations from doing unnecessary work */
+  *:hover {
+    transform: none;
+  }
+
+  /* Let the browser render scrolling more efficiently */
+  html {
+    scroll-behavior: auto !important;
+  }
+
+  body {
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Avoid expensive shadows on small screens */
+  .faq-card,
+  .shipping-content,
+  .book-card,
+  .bundle-card,
+  .monthly-card,
+  .story-card {
+    box-shadow: none;
+  }
+
+  /* Keep FAQ accordion lightweight */
+  .faq-answer {
+    transition: max-height .2s ease !important;
+  }
+
+  /* Don't animate FAQ cards themselves */
+  .faq-card {
+    transition: background-color .2s ease !important;
+  }
+
+  .faq-card:hover {
+    transform: none !important;
+  }
+
+  /* Prevent images from causing rendering surprises */
+  img {
+    content-visibility: auto;
+  }
+}
