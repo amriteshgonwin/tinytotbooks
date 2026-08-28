@@ -247,7 +247,15 @@
 
   <!-- MANAGER -->
   <main id="managerScreen" class="page hidden">
+<div class="manager-tabs">
+  <button id="booksTab" class="manager-tab active" type="button">
+    Books
+  </button>
 
+  <button id="ordersTab" class="manager-tab" type="button">
+    Orders
+  </button>
+</div>
     <div class="topbar">
       <div>
         <div class="brand">TinyTotBooks Manager</div>
@@ -341,7 +349,42 @@
       <div id="images" class="images"></div>
 
     </section>
+<section id="ordersPanel" class="card hidden">
 
+  <div style="
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    flex-wrap:wrap;
+  ">
+
+    <div>
+      <h2>Orders</h2>
+
+      <p class="hint">
+        Confirmed and paid orders only.
+      </p>
+    </div>
+
+    <button
+      id="refreshOrdersButton"
+      class="secondary"
+      type="button"
+    >
+      Refresh orders
+    </button>
+
+  </div>
+
+  <div
+    id="ordersStatus"
+    class="status"
+  ></div>
+
+  <div id="ordersList"></div>
+
+</section>
   </main>
 
 
@@ -1466,7 +1509,262 @@ supabaseClient.auth.onAuthStateChange(
   }
 );
 
+/* =========================================================
+   ORDERS TAB
+========================================================= */
 
+const booksTabButton = document.getElementById('booksTab');
+const ordersTabButton = document.getElementById('ordersTab');
+
+const ordersPanel = document.getElementById('ordersPanel');
+const refreshOrdersButton =
+  document.getElementById('refreshOrdersButton');
+
+const ordersStatus =
+  document.getElementById('ordersStatus');
+
+const ordersList =
+  document.getElementById('ordersList');
+
+
+async function loadOrders() {
+
+  ordersStatus.textContent = 'Loading orders...';
+  ordersList.innerHTML = '';
+
+  const {
+    data: { session },
+    error: sessionError
+  } = await supabaseClient.auth.getSession();
+
+  if (sessionError) {
+    ordersStatus.textContent =
+      `Could not check login: ${sessionError.message}`;
+    return;
+  }
+
+  if (!session) {
+    ordersStatus.textContent =
+      'Please sign in again.';
+    return;
+  }
+
+  const {
+    data: orders,
+    error
+  } = await supabaseClient
+    .from('orders')
+    .select(`
+      id,
+      order_number,
+      customer_name,
+      customer_phone,
+      customer_email,
+      shipping_address,
+      items,
+      subtotal,
+      shipping,
+      total,
+      currency,
+      payment_status,
+      order_status,
+      created_at,
+      paid_at
+    `)
+    .eq('payment_status', 'paid')
+    .eq('order_status', 'confirmed')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+
+    console.error('Orders query error:', error);
+
+    ordersStatus.textContent =
+      `Could not load orders: ${error.message}`;
+
+    return;
+  }
+
+  if (!orders || orders.length === 0) {
+
+    ordersStatus.textContent =
+      'No confirmed paid orders yet.';
+
+    return;
+  }
+
+  ordersStatus.textContent =
+    `${orders.length} confirmed order${orders.length === 1 ? '' : 's'}`;
+
+  ordersList.innerHTML = orders.map(order => {
+
+    const items =
+      Array.isArray(order.items)
+        ? order.items
+        : [];
+
+    const books = items.length
+      ? items.map(item => `
+          <li>
+            <strong>
+              ${escapeHtml(item.title || 'Book')}
+            </strong>
+            × ${Number(item.quantity ?? item.qty ?? 1)}
+            — ₹${Number(
+              item.line_total ??
+              ((item.unit_price || 0) *
+              (item.quantity ?? item.qty ?? 1))
+            ).toFixed(2)}
+          </li>
+        `).join('')
+      : '<li>No item details stored.</li>';
+
+    const paidAt = order.paid_at
+      ? new Date(order.paid_at).toLocaleString('en-IN')
+      : '—';
+
+    return `
+      <article class="card"
+        style="margin-top:16px;margin-bottom:0;">
+
+        <div style="
+          display:flex;
+          justify-content:space-between;
+          gap:12px;
+          align-items:flex-start;
+          flex-wrap:wrap;
+        ">
+
+          <div>
+
+            <h3 style="margin-bottom:6px;">
+              ${escapeHtml(
+                order.order_number ||
+                `Order #${order.id}`
+              )}
+            </h3>
+
+            <div class="hint">
+              Paid: ${escapeHtml(paidAt)}
+            </div>
+
+          </div>
+
+          <strong style="font-size:1.15rem;">
+            ₹${Number(order.total || 0).toFixed(2)}
+          </strong>
+
+        </div>
+
+        <hr style="
+          border:0;
+          border-top:1px solid #e5e5e5;
+          margin:18px 0;
+        ">
+
+        <p>
+          <strong>Customer:</strong>
+          ${escapeHtml(order.customer_name || '—')}
+        </p>
+
+        <p>
+          <strong>Phone:</strong>
+          ${escapeHtml(order.customer_phone || '—')}
+        </p>
+
+        <p>
+          <strong>Email:</strong>
+          ${escapeHtml(order.customer_email || '—')}
+        </p>
+
+        <p>
+          <strong>Delivery address:</strong><br>
+          ${escapeHtml(
+            order.shipping_address || '—'
+          ).replace(/\n/g, '<br>')}
+        </p>
+
+        <p>
+          <strong>Books ordered:</strong>
+        </p>
+
+        <ul>
+          ${books}
+        </ul>
+
+        <div style="margin-top:16px;">
+
+          <div>
+            Subtotal:
+            ₹${Number(order.subtotal || 0).toFixed(2)}
+          </div>
+
+          <div>
+            Shipping:
+            ₹${Number(order.shipping || 0).toFixed(2)}
+          </div>
+
+          <div style="
+            font-size:1.1rem;
+            margin-top:5px;
+          ">
+            <strong>
+              Total paid:
+              ₹${Number(order.total || 0).toFixed(2)}
+            </strong>
+          </div>
+
+        </div>
+
+      </article>
+    `;
+
+  }).join('');
+}
+
+
+ordersTabButton.addEventListener(
+  'click',
+  async () => {
+
+    booksTabButton.classList.remove('active');
+    ordersTabButton.classList.add('active');
+
+    document
+      .querySelectorAll('#managerScreen > .card')
+      .forEach(section => {
+        section.classList.add('hidden');
+      });
+
+    ordersPanel.classList.remove('hidden');
+
+    await loadOrders();
+  }
+);
+
+
+booksTabButton.addEventListener(
+  'click',
+  () => {
+
+    booksTabButton.classList.add('active');
+    ordersTabButton.classList.remove('active');
+
+    document
+      .querySelectorAll('#managerScreen > .card')
+      .forEach(section => {
+        section.classList.remove('hidden');
+      });
+
+    ordersPanel.classList.add('hidden');
+  }
+);
+
+
+refreshOrdersButton.addEventListener(
+  'click',
+  loadOrders
+);
 /* =========================================================
    START
 ========================================================= */

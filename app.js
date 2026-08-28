@@ -1823,11 +1823,17 @@ function renderCart(){
     }))
     .filter(x=>x.book);
 
-  const total=lines.reduce(
+  /*
+   * SUBTOTAL = BOOKS ONLY
+   */
+  const subtotal=lines.reduce(
     (n,x)=>n+x.book.price*x.qty,
     0
   );
 
+  /*
+   * Render the books immediately.
+   */
   document.querySelector('#cartItems').innerHTML=
     lines.length
       ? lines.map(({book,qty})=>`
@@ -1850,14 +1856,98 @@ function renderCart(){
         `).join('')
       : '<p class="empty">Your bag is waiting for its first story.</p>';
 
-  document.querySelector('#cartTotal').textContent=money(total);
+  /*
+   * Always show the REAL BOOK SUBTOTAL immediately.
+   */
+  document.querySelector('#cartSubtotal').textContent=
+    money(subtotal);
 
-  document.querySelector('#shippingMessage').textContent=
-    total===0
-      ? 'Add a story to get started.'
-      : total>=state.shipping
-        ? 'You’ve unlocked free delivery! 🎉'
-        : `Add ${money(state.shipping-total)} more for free delivery.`;
+  /*
+   * Empty cart.
+   */
+  if(subtotal===0){
+    document.querySelector('#cartShipping').textContent='₹0';
+    document.querySelector('#cartTotal').textContent='₹0';
+    document.querySelector('#shippingMessage').textContent=
+      'Add a story to get started.';
+    return;
+  }
+
+  /*
+   * FREE SHIPPING once subtotal reaches the existing
+   * ₹799 threshold (state.shipping).
+   */
+  if(subtotal>=state.shipping){
+    document.querySelector('#cartShipping').textContent='Free';
+    document.querySelector('#cartTotal').textContent=
+      money(subtotal);
+
+    document.querySelector('#shippingMessage').textContent=
+      'You’ve unlocked free delivery! 🎉';
+
+    return;
+  }
+
+  /*
+   * Below ₹799:
+   *
+   * Get the ACTUAL shipping charge from Supabase.
+   */
+  supabase
+    .from('site_settings')
+    .select('value')
+    .eq('key','shipping_charge')
+    .maybeSingle()
+    .then(({data,error})=>{
+
+      let shippingCharge=70;
+
+      if(!error && data){
+        const parsed=Number(data.value);
+
+        if(Number.isFinite(parsed) && parsed>=0){
+          shippingCharge=parsed;
+        }
+      }
+
+      /*
+       * Shipping = Supabase setting.
+       */
+      document.querySelector('#cartShipping').textContent=
+        money(shippingCharge);
+
+      /*
+       * Total = books + shipping.
+       */
+      document.querySelector('#cartTotal').textContent=
+        money(subtotal+shippingCharge);
+
+      /*
+       * Free-delivery progress.
+       */
+      document.querySelector('#shippingMessage').textContent=
+        `Add ${money(state.shipping-subtotal)} more for free delivery.`;
+    })
+    .catch(error=>{
+      console.error(
+        'Unable to load shipping charge:',
+        error
+      );
+
+      /*
+       * Safe fallback if Supabase is temporarily unavailable.
+       */
+      const shippingCharge=70;
+
+      document.querySelector('#cartShipping').textContent=
+        money(shippingCharge);
+
+      document.querySelector('#cartTotal').textContent=
+        money(subtotal+shippingCharge);
+
+      document.querySelector('#shippingMessage').textContent=
+        `Add ${money(state.shipping-subtotal)} more for free delivery.`;
+    });
 }
 
 function openCart(){
@@ -2513,7 +2603,10 @@ body: JSON.stringify({
        * Razorpay calls this ONLY after successful payment.
        */
       handler: async function(paymentResponse) {
-
+const orderCart = state.cart.map(item => ({
+  book_id: item.id,
+  qty: item.qty
+}));
         console.log(
           'Razorpay payment response:',
           paymentResponse
@@ -2559,8 +2652,8 @@ body: JSON.stringify({
                   address
                 },
 
-cart: state.cart.map(item => ({
-  id: item.id,
+items: state.cart.map(item => ({
+  book_id: item.id,
   qty: item.qty
 }))
               })

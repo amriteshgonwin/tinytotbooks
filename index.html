@@ -86,7 +86,33 @@
     <aside class="cart-drawer" id="cartDrawer" aria-label="Shopping bag" aria-hidden="true">
       <div class="drawer-head"><h2>Your little library</h2><button class="close" data-close="cartDrawer" aria-label="Close cart">×</button></div>
       <div id="cartItems"></div>
-      <div class="cart-footer"><p id="shippingMessage"></p><div class="total-row"><strong>Subtotal</strong><strong id="cartTotal">₹0</strong></div><button class="button button-dark" id="checkoutButton">Continue to checkout</button></div>
+<div class="cart-footer">
+
+  <p id="shippingMessage"></p>
+
+  <div class="total-row">
+    <strong>Subtotal</strong>
+    <strong id="cartSubtotal">₹0</strong>
+  </div>
+
+  <div class="total-row">
+    <strong>Shipping</strong>
+    <strong id="cartShipping">₹0</strong>
+  </div>
+
+  <div class="total-row">
+    <strong>Total</strong>
+    <strong id="cartTotal">₹0</strong>
+  </div>
+
+  <button
+    class="button button-dark"
+    id="checkoutButton"
+  >
+    Continue to checkout
+  </button>
+
+</div>
     </aside>
     <div class="overlay" id="overlay"></div>
     <dialog id="searchDialog"><div class="dialog-head"><h2>Find a story</h2><button class="close" data-close="searchDialog">×</button></div><input id="searchInput" class="search-input" placeholder="Try 'animals', 'magic', or a title…" autofocus /><div id="searchResults" class="search-results"></div></dialog>
