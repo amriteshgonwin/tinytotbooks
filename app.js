@@ -1954,8 +1954,28 @@ const pages={
   bulk:renderBulk,
   reviews:renderReviews,
   shipping:renderShipping,
-  faqs:renderFAQs
+  faqs:renderFAQs,
+  'track-order': renderTrackOrder,
 };
+
+if(view === 'order') {
+
+  const orderNumber =
+    decodeURIComponent(
+      parts.slice(1).join('/')
+    );
+
+  if(orderNumber) {
+    renderOrderConfirmation(orderNumber);
+  } else {
+    renderHome();
+  }
+
+} else {
+
+  (pages[view] || renderHome)();
+
+}
     (pages[view]||renderHome)();
 
   }
@@ -1970,10 +1990,15 @@ function addToCart(id){
 
   const line=state.cart.find(x=>x.id===id);
 
-  line
-    ? line.qty++
-    : state.cart.push({id,qty:1});
 
+if (line) {
+  line.qty = 1;
+} else {
+  state.cart.push({
+    id,
+    qty: 1
+  });
+}
   save();
   openCart();
 }
@@ -1990,10 +2015,11 @@ function addBundle(id){
          Number(x.id) === Number(id)
   );
 
-  line
-    ? line.qty++
-    : state.cart.push({
-        type: 'bundle',
+if (line) {
+  line.qty = 1;
+} else {
+  state.cart.push({
+  type: 'bundle',
         id: Number(id),
         qty: 1
       });
@@ -2001,7 +2027,7 @@ function addBundle(id){
   save();
   openCart();
 }
-
+}
 function addMonthlyPick(id){
   const pick = state.monthlyPicks.find(
     p => Number(p.id) === Number(id)
@@ -2014,18 +2040,31 @@ function addMonthlyPick(id){
          Number(x.id) === Number(id)
   );
 
-  line
-    ? line.qty++
-    : state.cart.push({
-        type: 'monthly',
-        id: Number(id),
-        qty: 1
-      });
-
+if (line) {
+  line.qty = 1;
+} else {
+  state.cart.push({
+    type: 'monthly',
+    id: Number(id),
+    qty: 1
+  });
+}
   save();
   openCart();
 }
+function removeFromCart(type, id){
 
+  state.cart = state.cart.filter(
+    item =>
+      !(
+        (item.type || 'book') === type &&
+        Number(item.id) === Number(id)
+      )
+  );
+
+  save();
+  renderCart();
+}
 function changeQty(type,id,d){
   const item = state.cart.find(
     x =>
@@ -2035,8 +2074,11 @@ function changeQty(type,id,d){
 
   if(!item) return;
 
+if (type === 'book') {
+  item.qty = Math.min(1, item.qty + d);
+} else {
   item.qty += d;
-
+}
   if(item.qty <= 0){
     state.cart = state.cart.filter(
       x =>
@@ -2204,39 +2246,24 @@ function renderCart(){
                     : ''
                 }
 
-                <div class="qty">
-
-                  <button
-                    onclick="changeQty(
-                      '${type}',
-                      ${product.id},
-                      -1
-                    )"
-                  >
-                    −
-                  </button>
-
-                  <b>${qty}</b>
-
-                  <button
-                    onclick="changeQty(
-                      '${type}',
-                      ${product.id},
-                      1
-                    )"
-                  >
-                    +
-                  </button>
-
-                </div>
-
+<div class="qty">
+  <b>Quantity: 1</b>
+</div>
               </div>
 
               <strong>
                 ${money(productPrice * qty)}
               </strong>
-
-            </div>
+<button
+  class="cart-remove"
+  type="button"
+  aria-label="Remove item"
+  title="Remove item"
+  onclick="removeFromCart('${type}', ${product.id})"
+>
+  <span class="trash-icon" aria-hidden="true"></span>
+</button>
+              </div>
           `;
 
         }).join('')
@@ -2354,10 +2381,36 @@ function openCart(){
 }
 
 function closeCart(){
-  document.querySelector('#cartDrawer').classList.remove('open');
-  document.querySelector('#overlay').classList.remove('show');
-}
 
+  const cart = document.querySelector('#cartDrawer');
+  const overlay = document.querySelector('#overlay');
+
+  console.log(
+    'BEFORE CLOSE:',
+    cart.className,
+    overlay.className
+  );
+
+  cart.classList.remove('open');
+  overlay.classList.remove('show');
+
+  console.log(
+    'AFTER CLOSE:',
+    cart.className,
+    overlay.className
+  );
+
+  setTimeout(() => {
+
+    console.log(
+      '100ms LATER:',
+      cart.className,
+      overlay.className
+    );
+
+  }, 100);
+
+}
 function openBook(id){
   const b=state.books.find(x=>x.id===id);
   const d=document.querySelector('#bookDialog');
@@ -2396,6 +2449,581 @@ onclick="event.stopPropagation(); bookDialog.close(); location.hash='#book/${b.i
   `;
 
   d.showModal();
+}
+
+/* =========================================================
+   ORDER CONFIRMATION
+========================================================= */
+
+function renderOrderConfirmation(orderNumber) {
+
+  app.innerHTML = `
+    <section class="page-hero">
+      <span class="eyebrow">Order confirmed</span>
+
+      <h1>
+        Your little order is on its way.
+      </h1>
+
+      <p>
+        Thank you for shopping with TinyTotBooks.
+      </p>
+    </section>
+
+    <section class="section">
+
+      <div
+        class="about-card"
+        style="
+          max-width:620px;
+          margin:0 auto;
+          text-align:center;
+        "
+      >
+
+        <p class="muted">
+          Your order number
+        </p>
+
+        <div
+          style="
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            gap:10px;
+            flex-wrap:wrap;
+            margin:12px 0 24px;
+          "
+        >
+
+          <strong
+            id="confirmationOrderNumber"
+            style="
+              font-size:1.35rem;
+              letter-spacing:.04em;
+            "
+          >
+            ${esc(orderNumber)}
+          </strong>
+
+          <button
+            class="tiny-button"
+            type="button"
+            onclick="copyOrderNumber()"
+          >
+            Copy
+          </button>
+
+        </div>
+
+        <div
+          style="
+            background:#f7f3eb;
+            border-radius:14px;
+            padding:18px;
+            margin-top:20px;
+          "
+        >
+
+          <strong>
+            Keep this order number safe.
+          </strong>
+
+          <p
+            class="muted"
+            style="margin-bottom:0"
+          >
+            You can enter it on the
+            <a href="#track-order">
+              Track your order
+            </a>
+            page in the footer to view your order later.
+          </p>
+
+        </div>
+
+      </div>
+
+    </section>
+  `;
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+function renderTrackOrder() {
+
+  app.innerHTML = `
+    <section class="page-hero">
+      <span class="eyebrow">Track your order</span>
+
+      <h1>
+        Where's your little order?
+      </h1>
+
+      <p>
+        Enter the order number and phone number
+        used when placing your order.
+      </p>
+    </section>
+
+    <section class="section">
+
+      <div
+        class="about-card track-order-card"
+      >
+
+        <div class="track-order-icon">
+          📦
+        </div>
+
+        <h2>
+          Find your order
+        </h2>
+
+        <p class="muted">
+          Both details must match the order
+          placed with TinyTotBooks.
+        </p>
+
+        <form id="trackOrderForm">
+
+          <label for="trackOrderNumber">
+            Order number
+          </label>
+
+          <input
+            id="trackOrderNumber"
+            type="text"
+            autocomplete="off"
+            placeholder="TTB-1787934096443-XXXXXX"
+            required
+          >
+
+          <label for="trackOrderPhone">
+            Phone number
+          </label>
+
+          <input
+            id="trackOrderPhone"
+            type="tel"
+            inputmode="tel"
+            autocomplete="tel"
+            placeholder="Phone number used at checkout"
+            required
+          >
+
+          <button
+            class="primary track-order-button"
+            type="submit"
+          >
+            Track my order
+          </button>
+
+          <div
+            id="trackOrderStatus"
+            class="status"
+          ></div>
+
+        </form>
+
+      </div>
+
+      <div
+        id="trackedOrderResult"
+        class="track-order-result"
+      ></div>
+
+    </section>
+  `;
+
+  const form =
+    document.getElementById(
+      'trackOrderForm'
+    );
+
+  const status =
+    document.getElementById(
+      'trackOrderStatus'
+    );
+
+  const result =
+    document.getElementById(
+      'trackedOrderResult'
+    );
+
+  form.addEventListener(
+    'submit',
+    async event => {
+
+      event.preventDefault();
+
+      console.log('TRACK ORDER BUTTON CLICKED');
+
+      const orderNumber =
+        document
+          .getElementById(
+            'trackOrderNumber'
+          )
+          .value
+          .trim();
+
+      const phoneNumber =
+        document
+          .getElementById(
+            'trackOrderPhone'
+          )
+          .value
+          .trim();
+
+      result.innerHTML = '';
+
+status.textContent =
+  'Looking for your order...';
+
+status.classList.remove('error');
+      const button =
+        form.querySelector(
+          'button[type="submit"]'
+        );
+
+      button.disabled = true;
+      button.textContent =
+        'Checking...';
+
+      try {
+
+        const {
+          data,
+          error
+        } =
+          await supabase.functions.invoke(
+            'track-order',
+            {
+              body: {
+                order_number:
+                  orderNumber,
+
+                phone_number:
+                  phoneNumber
+              }
+            }
+          );
+
+        if (error) {
+          throw error;
+        }
+
+        if (
+          !data ||
+          !data.success ||
+          !data.order
+        ) {
+
+status.textContent =
+  data?.error ||
+  'We could not find an order matching those details.';
+
+status.classList.add('error');
+          return;
+        }
+
+status.textContent = '';
+status.classList.remove('error');
+        renderTrackedOrder(
+          data.order
+        );
+
+      } catch (error) {
+
+console.log(
+  'TRACK ORDER FUNCTION RESPONSE:',
+  error
+);
+
+        console.error(
+          'Track order error:',
+          error
+        );
+
+status.textContent =
+  'We could not look up your order right now. Please try again.';
+
+status.classList.add('error');
+      } finally {
+
+        button.disabled = false;
+        button.textContent =
+          'Track my order';
+
+      }
+
+    }
+  );
+
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+function renderTrackedOrder(order) {
+
+  const result =
+    document.getElementById(
+      'trackedOrderResult'
+    );
+
+  if (!result) return;
+
+  const items =
+    Array.isArray(order.items)
+      ? order.items
+      : [];
+
+  const itemMarkup =
+    items.length
+      ? items.map(item => {
+
+          const quantity =
+            Number(
+              item.quantity ??
+              item.qty ??
+              1
+            );
+
+          const unitPrice =
+            Number(
+              item.unit_price ??
+              0
+            );
+
+          const lineTotal =
+            Number(
+              item.line_total ??
+              (unitPrice * quantity)
+            );
+
+          return `
+            <li class="tracked-order-item">
+
+              <span>
+                <strong>
+                  ${esc(
+                    item.title ||
+                    'Book'
+                  )}
+                </strong>
+
+                <span class="tracked-order-quantity">
+                  × ${quantity}
+                </span>
+              </span>
+
+              <strong>
+                ₹${lineTotal.toFixed(2)}
+              </strong>
+
+            </li>
+          `;
+
+        }).join('')
+      : `
+          <li class="tracked-order-item">
+            <span>
+              Order details
+            </span>
+          </li>
+        `;
+
+  const orderDate =
+    order.created_at
+      ? new Date(
+          order.created_at
+        ).toLocaleString(
+          'en-IN'
+        )
+      : '—';
+
+  result.innerHTML = `
+
+    <article class="tracked-order-card">
+
+      <div class="tracked-order-header">
+
+        <div>
+
+          <span class="eyebrow">
+            Order found
+          </span>
+
+          <h2>
+            Your order
+          </h2>
+
+        </div>
+
+        <span class="tracked-order-status">
+          Confirmed
+        </span>
+
+      </div>
+
+      <div class="tracked-order-number">
+
+        <span>
+          Order number
+        </span>
+
+        <strong>
+          ${esc(
+            order.order_number
+          )}
+        </strong>
+
+      </div>
+
+      <div class="tracked-order-customer">
+
+        <p>
+          <strong>
+            ${esc(
+              order.customer_name ||
+              'Customer'
+            )}
+          </strong>
+        </p>
+
+        <p class="muted">
+          Order placed:
+          ${esc(orderDate)}
+        </p>
+
+      </div>
+
+      <div class="tracked-order-section">
+
+        <h3>
+          Books ordered
+        </h3>
+
+        <ul class="tracked-order-items">
+          ${itemMarkup}
+        </ul>
+
+      </div>
+
+      <div class="tracked-order-total">
+
+        <div>
+          Subtotal
+          <span>
+            ₹${Number(
+              order.subtotal || 0
+            ).toFixed(2)}
+          </span>
+        </div>
+
+        <div>
+          Shipping
+          <span>
+            ₹${Number(
+              order.shipping || 0
+            ).toFixed(2)}
+          </span>
+        </div>
+
+        <div class="tracked-order-grand-total">
+          <strong>
+            Total paid
+          </strong>
+
+          <strong>
+            ₹${Number(
+              order.total || 0
+            ).toFixed(2)}
+          </strong>
+        </div>
+
+      </div>
+
+    </article>
+
+    <div class="tracked-order-message">
+
+      <div class="tracked-order-message-icon">
+        💬
+      </div>
+
+      <div>
+
+        <h3>
+          What happens next?
+        </h3>
+
+        <p>
+          As a small home-run business, we personally
+          handle every order from packing to dispatch.
+          You should receive a message from us within
+          the next 24 hours regarding your order.
+        </p>
+
+        <p>
+          Any further updates and correspondence
+          will follow on WhatsApp.
+        </p>
+
+      </div>
+
+    </div>
+
+  `;
+
+  result.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+}
+
+function copyOrderNumber() {
+
+  const element =
+    document.querySelector('#confirmationOrderNumber');
+
+  if (!element) return;
+
+  const orderNumber =
+    element.textContent.trim();
+
+  navigator.clipboard.writeText(orderNumber)
+    .then(() => {
+
+      const button =
+        document.querySelector(
+          '#confirmationOrderNumber + button'
+        );
+
+      if (!button) return;
+
+      const original =
+        button.textContent;
+
+      button.textContent = 'Copied!';
+
+      setTimeout(() => {
+        button.textContent = original;
+      }, 1500);
+
+    })
+    .catch(() => {
+
+      alert(
+        'Could not copy automatically. Please copy the order number manually.'
+      );
+
+    });
 }
 
 /* =========================================================
@@ -2821,16 +3449,27 @@ document.querySelector('#cartButton').onclick=openCart;
 
 document.querySelector('#overlay').onclick=closeCart;
 
-document.querySelectorAll('[data-close]').forEach(b=>{
-  b.onclick=()=>{
-    const id=b.dataset.close;
+document.querySelectorAll('[data-close]').forEach(button => {
+console.log('CART CLOSE BUTTON TOUCHED');
+  const handleClose = event => {
 
-    id==='cartDrawer'
-      ? closeCart()
-      : document.querySelector('#'+id).close();
+    event.preventDefault();
+    event.stopPropagation();
+
+    const id = button.dataset.close;
+
+    if (id === 'cartDrawer') {
+      closeCart();
+    } else {
+      document
+        .querySelector('#' + id)
+        ?.close();
+    }
   };
-});
 
+  button.addEventListener('click', handleClose);
+  button.addEventListener('pointerup', handleClose);
+});
 document.querySelector('#searchButton').onclick=()=>{
   searchDialog.showModal();
   searchInput.focus();
@@ -3008,8 +3647,6 @@ const orderCart = state.cart.map(item => ({
           paymentResponse
         );
 
-        checkoutNotice.textContent =
-          'Payment received. Verifying securely…';
 
         try {
 
@@ -3075,27 +3712,43 @@ items: state.cart.map(item => ({
            *
            * Only NOW do we consider the order successful.
            */
-          checkoutNotice.textContent =
-            'Order confirmed! Thank you for shopping with TinyTotBooks.';
-
+renderOrderConfirmation(
+  verifyData.order?.order_number ||
+  verifyData.order_number ||
+  data.order_number
+);
           /*
            * Clear the cart only after successful
            * server-side payment verification.
            */
-          state.cart = [];
+state.cart = [];
 
-          save();
-          renderCart();
+save();
 
-          form.reset();
+form.reset();
 
-          /*
-           * Give the user a moment to see the confirmation.
-           */
-          setTimeout(() => {
-            checkoutDialog.close();
-          }, 2500);
+checkoutDialog.close();
 
+/*
+ * The order has been verified and saved by the server.
+ * Only now send the customer to the confirmation page.
+ */
+if (
+  verifyData.order &&
+  verifyData.order.order_number
+) {
+
+  location.hash =
+    `#order/${encodeURIComponent(
+      verifyData.order.order_number
+    )}`;
+
+} else {
+
+  checkoutNotice.textContent =
+    'Order confirmed, but we could not display the order number. Please contact us.';
+
+}
           console.log(
             'Verified TinyTotBooks order:',
             verifyData
@@ -3145,6 +3798,7 @@ items: state.cart.map(item => ({
           'Payment failed or was cancelled. No order was placed.';
       }
     );
+console.log('TTB: About to close checkout and open Razorpay');
 
 checkoutDialog.close();
 razorpay.open();
