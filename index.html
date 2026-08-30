@@ -144,49 +144,259 @@
 
 <form id="checkoutForm" class="checkout-form">
 
-  <label>
-    Name
-    <input
-      name="name"
-      required
-      placeholder="Your name"
-      autocomplete="name"
-    />
-  </label>
+  <!-- CUSTOMER DETAILS -->
 
-  <label>
-    Phone / WhatsApp number
-    <input
-      name="phone"
-      required
-      type="tel"
-      inputmode="numeric"
-      autocomplete="tel"
-      placeholder="10-digit mobile number"
-    />
-  </label>
+  <div class="checkout-section">
+    <div class="checkout-section-head">
+      <span class="eyebrow">Your details</span>
+      <h3>Let's keep in touch.</h3>
+    </div>
 
-  <label>
-    Email <span class="muted">(optional)</span>
-    <input
-      name="email"
-      type="email"
-      placeholder="you@example.com"
-      autocomplete="email"
-    />
-  </label>
+    <label>
+      Full name
+      <input
+        name="name"
+        required
+        placeholder="Your full name"
+        autocomplete="name"
+      />
+    </label>
 
-  <label>
-    Delivery address
-    <textarea
-      name="address"
-      required
-      placeholder="House / street / city / PIN"
-      autocomplete="street-address"
-    ></textarea>
-  </label>
+    <label>
+      WhatsApp number
+      <input
+        name="phone"
+        required
+        type="tel"
+        inputmode="numeric"
+        autocomplete="tel"
+        placeholder="10-digit mobile number"
+      />
+      <small class="muted">
+        Please enter a real WhatsApp number. This is our primary way
+        of reaching you if there's ever an issue with your order.
+      </small>
+    </label>
+
+    <label>
+      WhatsApp OTP
+      <input
+        name="otp"
+        type="text"
+        inputmode="numeric"
+        autocomplete="one-time-code"
+        placeholder="OTP"
+      />
+      <small class="muted">
+        Phone verification is coming soon. For now, you may leave this blank.
+      </small>
+    </label>
+
+    <label>
+      Email <span class="muted">(optional)</span>
+      <input
+        name="email"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+      />
+    </label>
+  </div>
+
+
+  <!-- DELIVERY ADDRESS -->
+
+  <div class="checkout-section">
+
+    <div class="checkout-section-head">
+      <span class="eyebrow">Delivery address</span>
+      <h3>Where should we send it?</h3>
+    </div>
+
+    <div class="checkout-address-note">
+
+      <strong>We deliver through India Post.</strong>
+
+      <p>
+        Please enter your address clearly and completely in the format
+        below so your parcel can reach you without unnecessary delays.
+      </p>
+
+      <div class="checkout-address-example">
+        <strong>Standard Address Structure:</strong>
+
+        <span>Line 1: Recipient's Full Name</span>
+        <span>
+          Line 2: House/Flat No., Building/Society Name, Street/Road Name
+        </span>
+        <span>
+          Line 3: Area/Locality Name, Landmark (optional)
+        </span>
+        <span>
+          Line 4: City/Town — PIN Code
+        </span>
+        <span>
+          Line 5: District, State, India
+        </span>
+      </div>
+
+    </div>
+
+
+    <label>
+      House / Flat No.
+      <input
+        name="address_house"
+        required
+        autocomplete="address-line1"
+        placeholder="e.g. Flat 204"
+      />
+    </label>
+
+
+    <label>
+      Building / Society Name
+      <input
+        name="address_building"
+        required
+        autocomplete="address-line2"
+        placeholder="e.g. Green Valley Apartments"
+      />
+    </label>
+
+
+    <label>
+      Street / Road Name
+      <input
+        name="address_street"
+        required
+        placeholder="e.g. MG Road"
+      />
+    </label>
+
+
+    <label>
+      Area / Locality
+      <input
+        name="address_area"
+        required
+        placeholder="e.g. Connaught Place"
+      />
+    </label>
+
+
+    <label>
+      Landmark <span class="muted">(optional)</span>
+      <input
+        name="address_landmark"
+        placeholder="e.g. Near Central Park"
+      />
+    </label>
+
+
+    <div class="checkout-field-row">
+
+      <label>
+        City / Town
+        <input
+          name="address_city"
+          required
+          autocomplete="address-level2"
+          placeholder="City / Town"
+        />
+      </label>
+
+      <label>
+        PIN Code
+        <input
+          name="address_pin"
+          required
+          inputmode="numeric"
+          autocomplete="postal-code"
+          placeholder="6-digit PIN"
+        />
+      </label>
+
+    </div>
+
+
+    <label>
+      District
+      <input
+        name="address_district"
+        required
+        placeholder="District"
+      />
+    </label>
+
+
+    <label>
+      State
+      <input
+        name="address_state"
+        required
+        autocomplete="address-level1"
+        placeholder="State"
+      />
+    </label>
+
+
+    <label>
+      Country
+      <input
+        name="address_country"
+        value="INDIA"
+        readonly
+        aria-readonly="true"
+      />
+    </label>
+
+  </div>
+
+
+  <!-- COUPON -->
+
+  <div class="checkout-section">
+
+    <div class="checkout-section-head">
+      <span class="eyebrow">A little extra</span>
+      <h3>Have a coupon?</h3>
+    </div>
+
+    <div class="checkout-coupon-row">
+
+      <input
+        id="checkoutCouponInput"
+        type="text"
+        placeholder="Enter coupon code"
+        autocomplete="off"
+        autocapitalize="characters"
+        spellcheck="false"
+      />
+
+      <button
+        id="applyCouponButton"
+        class="button button-light"
+        type="button"
+      >
+        Apply
+      </button>
+
+    </div>
+
+    <div
+      id="checkoutCouponMessage"
+      class="muted"
+      aria-live="polite"
+    ></div>
+
+  </div>
+
+
+  <!-- PAYMENT -->
 
   <div class="payment-box">
+
     <span>🔒</span>
 
     <div>
@@ -195,7 +405,9 @@
         You'll be redirected to Razorpay to complete your payment.
       </p>
     </div>
+
   </div>
+
 
   <button
     class="button button-dark"

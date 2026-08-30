@@ -23,7 +23,7 @@ const defaultContent={
   heroTitle:'Stories that make',
   heroHighlight:'little minds bloom.',
   heroCopy:'Thoughtfully chosen books for curious kids — packed with imagination, kindness, and plenty of giggles.',
-  heroButton:'Browse the bookshelf',
+  heroButton:'Browse current offers',
   collectionTitle:'A story for every kind of day',
   saleText:'Curious about the little story behind TinyTotBooks?',
   clubEyebrow:'A fresh story each month',
@@ -31,7 +31,9 @@ const defaultContent={
   clubText:'Age-right, joy-packed monthly reading picks, delivered to your door.',
   ageEyebrow:'Built for growing readers',
   ageTitle:'Find their next favourite.',
-  ageText:'Browse by age, interest, or the kind of adventure they’re craving today.'
+  ageText:'Browse by age, interest, or the kind of adventure they’re craving today.',
+  offersMessage:'Our current offers are waiting for you!',
+  offersRules:'Coupons can be used once per order. Only one coupon may be applied to an order. Offers cannot be combined with other discounts.'
 };
 
 const defaultCharacters=[
@@ -40,7 +42,91 @@ const defaultCharacters=[
   {id:103,title:'Big adventurers',description:'For explorers ready to travel far without leaving the sofa.',icon:'🚀',color:'#ded2ff',target:'Adventure'}
 ];
 
+let appliedCoupon = null;
+document.addEventListener('click', async e => {
 
+  if (e.target.id !== 'applyCouponButton') return;
+
+  const input = document.querySelector('#checkoutCouponInput');
+  const message = document.querySelector('#checkoutCouponMessage');
+
+  if (!input || !message) return;
+
+  const code = input.value.trim().toUpperCase();
+
+  if (!code) {
+    appliedCoupon = null;
+    message.textContent = 'Please enter a coupon code.';
+    return;
+  }
+
+  message.textContent = 'Checking coupon…';
+
+  try {
+
+    const { data, error } = await supabase
+      .from('coupons')
+      .select('*')
+      .ilike('code', code)
+      .maybeSingle();
+
+    if (error) {
+      console.error('Coupon lookup failed:', error);
+      appliedCoupon = null;
+      message.textContent =
+        'Unable to check this coupon right now.';
+      return;
+    }
+
+    if (!data) {
+      appliedCoupon = null;
+      message.textContent = 'Invalid coupon code.';
+      return;
+    }
+
+    if (!data.active) {
+      appliedCoupon = null;
+      message.textContent =
+        'This coupon is no longer active.';
+      return;
+    }
+
+    if (data.expires_at) {
+      const expiresAt =
+        new Date(data.expires_at).getTime();
+
+      if (
+        Number.isFinite(expiresAt) &&
+        Date.now() >= expiresAt
+      ) {
+        appliedCoupon = null;
+        message.textContent =
+          'This coupon has expired.';
+        return;
+      }
+    }
+
+    appliedCoupon = {
+      code: data.code
+    };
+
+    message.textContent =
+      `Coupon ${data.code} applied.`;
+
+  } catch (error) {
+
+    console.error(
+      'Coupon application error:',
+      error
+    );
+
+    appliedCoupon = null;
+
+    message.textContent =
+      'Unable to check this coupon right now.';
+  }
+
+});
 const state={
 
   books:seedBooks,
@@ -379,7 +465,7 @@ function renderHome(){
         <span class="eyebrow">${esc(c.heroEyebrow)}</span>
         <h1>${esc(c.heroTitle)} <i>${esc(c.heroHighlight)}</i></h1>
         <p>${esc(c.heroCopy)}</p>
-        <a class="button button-dark" href="#books">${esc(c.heroButton)}</a>
+        <a class="button button-dark" href="#offers">${esc(c.heroButton)}</a>
       </div>
 
       <div class="hero-art logo-hero">
@@ -1925,6 +2011,222 @@ function renderCollabs(){
     </section>
   `;
 }
+
+function renderOffers(){
+
+  app.innerHTML = `
+
+    <section class="page offers-page">
+
+      <div class="page-head">
+
+        <span class="eyebrow">
+          Offers & Coupons
+        </span>
+
+        <h1>
+          Little treats for little readers.
+        </h1>
+
+        <p>
+          Discover our current offers and coupons
+          before you fill your bookshelf.
+        </p>
+
+      </div>
+
+
+      <!-- CURRENT OFFER MESSAGE -->
+
+      <div class="offers-info-card">
+
+        <span class="eyebrow">
+          Current offers
+        </span>
+
+        <p id="offersMessage">
+          ${esc(state.content.offersMessage)}
+        </p>
+
+      </div>
+
+
+      <!-- CURRENT COUPONS -->
+
+      <div class="offers-coupons-section">
+
+        <div class="section-head">
+
+          <span class="eyebrow">
+            Current coupons
+          </span>
+
+          <h2>
+            Save a little extra
+          </h2>
+
+        </div>
+
+        <div id="offersCouponList">
+
+          <p class="muted">
+            Loading coupons...
+          </p>
+
+        </div>
+
+      </div>
+
+
+      <!-- COUPON RULES -->
+
+      <div class="offers-info-card">
+
+        <span class="eyebrow">
+          Coupon rules
+        </span>
+
+        <p id="offersRules">
+          ${esc(state.content.offersRules)}
+        </p>
+
+      </div>
+
+    </section>
+
+  `;
+
+
+  /*
+   * LOAD ACTIVE COUPONS
+   */
+
+  supabase
+    .from('coupons')
+    .select('*')
+    .eq('active', true)
+    .order('created_at', { ascending: false })
+
+    .then(({data,error}) => {
+
+      const list =
+        document.querySelector('#offersCouponList');
+
+      if(!list) return;
+
+
+      /*
+       * DATABASE ERROR
+       */
+
+      if(error){
+
+        console.error(
+          'Could not load coupons:',
+          error
+        );
+
+        list.innerHTML =
+          '<p class="muted">Unable to load coupons right now.</p>';
+
+        return;
+      }
+
+
+      /*
+       * NO ACTIVE COUPONS
+       */
+
+      if(!data || !data.length){
+
+        list.innerHTML =
+          '<p class="muted">No active coupons right now. Check back soon!</p>';
+
+        return;
+      }
+
+
+      /*
+       * RENDER COUPONS
+       */
+
+      list.innerHTML =
+        data.map(coupon => {
+
+          const discount =
+            coupon.discount_type === 'percentage'
+              ? `${coupon.discount_value}% OFF`
+              : `${money(coupon.discount_value)} OFF`;
+
+
+          return `
+
+            <div class="coupon-card">
+
+              <div class="coupon-card-top">
+
+                <span class="eyebrow">
+                  Coupon
+                </span>
+
+                <strong class="coupon-discount">
+                  ${esc(discount)}
+                </strong>
+
+              </div>
+
+
+              <h3>
+                ${
+                  coupon.discount_type === 'percentage'
+                    ? `${coupon.discount_value}% off your order`
+                    : `${money(coupon.discount_value)} off your order`
+                }
+              </h3>
+
+
+              <p>
+                Use the code below at checkout.
+              </p>
+
+
+              <div class="coupon-code">
+                ${esc(coupon.code)}
+              </div>
+
+
+              ${
+                Number(coupon.minimum_order || 0) > 0
+                  ? `<small class="muted">
+                       Minimum order: ${money(coupon.minimum_order)}
+                     </small>`
+                  : ''
+              }
+
+            </div>
+
+          `;
+
+        }).join('');
+
+    })
+
+
+    /*
+     * UNEXPECTED LOADING ERROR
+     */
+
+    .catch(error => {
+
+      console.error(
+        'Coupon loading error:',
+        error
+      );
+
+    });
+
+}
+
 function route(){
 
   const parts = location.hash.slice(1).split('/');
@@ -1956,6 +2258,7 @@ const pages={
   shipping:renderShipping,
   faqs:renderFAQs,
   'track-order': renderTrackOrder,
+  offers: renderOffers,
 };
 
 if(view === 'order') {
@@ -3527,20 +3830,160 @@ document.querySelector('#checkoutForm').onsubmit = async e => {
   const form = e.currentTarget;
   const formData = new FormData(form);
 
-  const name = (formData.get('name') || '').trim();
-  const phone = (formData.get('phone') || '').trim();
-  const email = (formData.get('email') || '').trim();
-  const address = (formData.get('address') || '').trim();
+const name = (formData.get('name') || '').trim();
+const phone = (formData.get('phone') || '').trim();
+const otp = (formData.get('otp') || '').trim();
+const email = (formData.get('email') || '').trim();
 
+const address = {
+  house: (formData.get('address_house') || '').trim(),
+  building: (formData.get('address_building') || '').trim(),
+  street: (formData.get('address_street') || '').trim(),
+  area: (formData.get('address_area') || '').trim(),
+  landmark: (formData.get('address_landmark') || '').trim(),
+  city: (formData.get('address_city') || '').trim(),
+  pin: (formData.get('address_pin') || '').trim(),
+  district: (formData.get('address_district') || '').trim(),
+  state: (formData.get('address_state') || '').trim(),
+  country: 'INDIA'
+};
+
+/*
+ * OTP verification is not implemented yet.
+ *
+ * We collect the OTP now so the checkout form is ready
+ * for WhatsApp verification later.
+ *
+ * IMPORTANT:
+ * The OTP is intentionally NOT used for authorization
+ * or payment verification at this stage.
+ */
+
+if (!name || !phone) {
+  checkoutNotice.textContent =
+    'Please enter your full name and WhatsApp number.';
+  return;
+}
+
+/*
+ * Normalize an Indian WhatsApp number.
+ *
+ * Accepted examples:
+ *
+ * 9876543210
+ * +91 9876543210
+ * +919876543210
+ * 91 9876543210
+ * 91-9876543210
+ *
+ * Internally we always store/send the final
+ * 10-digit Indian mobile number.
+ */
+
+let cleanPhone =
+  phone.replace(/\D/g, '');
+
+/*
+ * Remove India's country code if the customer
+ * entered it.
+ */
+if (
+  cleanPhone.length === 12 &&
+  cleanPhone.startsWith('91')
+) {
+  cleanPhone =
+    cleanPhone.slice(2);
+}
+
+/*
+ * Indian mobile numbers must:
+ * - contain exactly 10 digits
+ * - begin with 6, 7, 8 or 9
+ */
+if (!/^[6-9]\d{9}$/.test(cleanPhone)) {
+  checkoutNotice.textContent =
+    'Please enter a valid Indian WhatsApp number.';
+  return;
+}
+
+/* Email remains optional.
+ */
+if (email) {
+  const emailPattern =
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+  if (!emailPattern.test(email)) {
+    checkoutNotice.textContent =
+      'Please enter a valid email address.';
+    return;
+  }
+}
+
+/*
+ * Every delivery field is required except landmark.
+ *
+ * The server performs the same validation again.
+ * Never rely on frontend validation for security.
+ */
+const requiredAddressFields = [
+  ['House / Flat No.', address.house],
+  ['Building / Society Name', address.building],
+  ['Street / Road Name', address.street],
+  ['Area / Locality', address.area],
+  ['City / Town', address.city],
+  ['PIN Code', address.pin],
+  ['District', address.district],
+  ['State', address.state]
+];
+
+const missingAddressField =
+  requiredAddressFields.find(
+    ([, value]) => !value
+  );
+
+if (missingAddressField) {
+  checkoutNotice.textContent =
+    `Please enter your ${missingAddressField[0]}.`;
+  return;
+}
+
+/*
+ * PIN must be exactly 6 digits.
+ */
+if (!/^\d{6}$/.test(address.pin)) {
+  checkoutNotice.textContent =
+    'Please enter a valid 6-digit PIN code.';
+  return;
+}
+
+/*
+ * Country is fixed by the form and is never taken
+ * from user input.
+ */
+address.country = 'INDIA';
+
+checkoutNotice.textContent =
+  'Preparing secure payment…';
   /*
    * Name, phone and delivery address are mandatory.
    * Email is optional.
    */
-  if (!name || !phone || !address) {
-    checkoutNotice.textContent =
-      'Please fill in your name, phone number and delivery address.';
-    return;
-  }
+if (
+  !name ||
+  !phone ||
+  !address.house ||
+  !address.building ||
+  !address.street ||
+  !address.area ||
+  !address.city ||
+  !address.pin ||
+  !address.district ||
+  !address.state
+) {
+  checkoutNotice.textContent =
+    'Please fill in all required customer and delivery details.';
+  return;
+}
 
   checkoutNotice.textContent = 'Preparing secure payment…';
 
@@ -3577,18 +4020,23 @@ document.querySelector('#checkoutForm').onsubmit = async e => {
         },
 
 body: JSON.stringify({
-  customer: {
-    name,
-    phone: formData.get('phone').trim(),
-    email: email || null,
-    address
-  },
+customer: {
+  name,
+  phone: cleanPhone,
+  otp: otp || null,
+  email: email || null,
+  address
+},
 
-cart: state.cart.map(item => ({
-  type: item.type || 'book',
-  id: item.id,
-  qty: item.qty
-}))
+  cart: state.cart.map(item => ({
+    type: item.type || 'book',
+    id: item.id,
+    qty: item.qty
+  })),
+
+  coupon_code: appliedCoupon
+    ? appliedCoupon.code
+    : null
 })
       }
     );
@@ -3617,18 +4065,18 @@ cart: state.cart.map(item => ({
 
       order_id: data.razorpay_order_id,
 
-      prefill: {
-        name,
-        email: email || undefined,
-        contact: phone
-      },
+prefill: {
+  name,
+  email: email || undefined,
+  contact: cleanPhone
+},
 
-      notes: {
-        customer_name: name,
-        customer_phone: phone,
-        customer_email: email || '',
-        shipping_address: address
-      },
+notes: {
+  customer_name: name,
+  customer_phone: cleanPhone,
+  customer_email: email || '',
+  shipping_address: JSON.stringify(address)
+},
 
       theme: {
         color: '#26343b'

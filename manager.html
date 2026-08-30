@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TinyTotBooks Manager</title>
-
+<link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
   <style>
@@ -20,12 +20,27 @@
     }
 
     button,
-    input {
+    input,
+    select,
+    textarea {
       font: inherit;
     }
 
+    button {
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 16px;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    button:disabled {
+      opacity: .55;
+      cursor: not-allowed;
+    }
+
     .page {
-      max-width: 1050px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 28px 18px 60px;
     }
@@ -35,7 +50,7 @@
       justify-content: space-between;
       align-items: center;
       gap: 15px;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
     }
 
     .brand {
@@ -68,7 +83,8 @@
     }
 
     input,
-    select {
+    select,
+    textarea {
       width: 100%;
       padding: 13px 14px;
       border: 1px solid #cbd2d5;
@@ -77,12 +93,8 @@
       margin-bottom: 16px;
     }
 
-    button {
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 16px;
-      cursor: pointer;
-      font-weight: 700;
+    textarea {
+      resize: vertical;
     }
 
     .primary {
@@ -100,6 +112,11 @@
       color: #8d2222;
     }
 
+    .success {
+      background: #dff1e3;
+      color: #236b35;
+    }
+
     .login {
       max-width: 460px;
       margin: 80px auto;
@@ -114,6 +131,39 @@
       min-height: 22px;
       font-size: .95rem;
     }
+
+    .hint {
+      font-size: .88rem;
+      color: #687277;
+      line-height: 1.5;
+    }
+
+    /* =========================
+       TABS
+    ========================= */
+
+    .manager-tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 22px;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
+
+    .manager-tab {
+      background: #e8e1d5;
+      color: #24343d;
+      white-space: nowrap;
+    }
+
+    .manager-tab.active {
+      background: #24343d;
+      color: white;
+    }
+
+    /* =========================
+       IMAGES
+    ========================= */
 
     .upload-area {
       border: 2px dashed #c5cbc9;
@@ -181,13 +231,161 @@
       margin-bottom: 7px;
     }
 
-    .hint {
-      font-size: .88rem;
-      color: #687277;
+    /* =========================
+       ORDERS
+    ========================= */
+
+    .order-card {
+      background: #fff;
+      border: 1px solid #e2e5e4;
+      border-radius: 16px;
+      padding: 20px;
+      margin-top: 16px;
+    }
+
+    .order-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .order-total {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .order-divider {
+      border: 0;
+      border-top: 1px solid #e5e5e5;
+      margin: 18px 0;
+    }
+
+    .order-card p {
       line-height: 1.5;
     }
 
-    @media (max-width: 600px) {
+    /* =========================
+       COUPONS
+    ========================= */
+
+    .coupon-form-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 0 16px;
+    }
+
+    .coupon-form-grid .full {
+      grid-column: 1 / -1;
+    }
+
+    .coupon-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 4px;
+    }
+
+    .coupon-list {
+      margin-top: 25px;
+    }
+
+    .coupon-card {
+      border: 1px solid #dfe3e2;
+      border-radius: 15px;
+      padding: 18px;
+      margin-top: 12px;
+      background: #fff;
+    }
+
+    .coupon-card.inactive {
+      opacity: .68;
+    }
+
+    .coupon-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .coupon-code {
+      font-size: 1.2rem;
+      font-weight: 800;
+      letter-spacing: .04em;
+    }
+
+    .coupon-badge {
+      display: inline-block;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: .75rem;
+      font-weight: 800;
+      margin-top: 7px;
+    }
+
+    .coupon-badge.active {
+      background: #dff1e3;
+      color: #236b35;
+    }
+
+    .coupon-badge.inactive {
+      background: #eee7e7;
+      color: #777;
+    }
+
+    .coupon-details {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .coupon-detail {
+      background: #f7f5f0;
+      border-radius: 10px;
+      padding: 10px;
+    }
+
+    .coupon-detail small {
+      display: block;
+      color: #687277;
+      margin-bottom: 4px;
+    }
+
+    .coupon-detail strong {
+      display: block;
+    }
+
+    .coupon-card-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 15px;
+    }
+
+    .coupon-card-actions button {
+      padding: 8px 12px;
+      font-size: .85rem;
+    }
+
+    .coupon-empty {
+      padding: 25px;
+      text-align: center;
+      border: 1px dashed #cbd2d5;
+      border-radius: 12px;
+      color: #687277;
+    }
+
+    .section-divider {
+      border: 0;
+      border-top: 1px solid #e5e5e5;
+      margin: 25px 0;
+    }
+
+    @media (max-width: 700px) {
       .page {
         padding: 18px 12px 40px;
       }
@@ -195,6 +393,18 @@
       .topbar {
         align-items: flex-start;
         flex-direction: column;
+      }
+
+      .coupon-form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .coupon-form-grid .full {
+        grid-column: auto;
+      }
+
+      .coupon-details {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .images {
@@ -205,20 +415,33 @@
         height: 160px;
       }
     }
+
+    @media (max-width: 420px) {
+      .coupon-details {
+        grid-template-columns: 1fr;
+      }
+    }
   </style>
 </head>
 
 <body>
 
-  <!-- LOGIN -->
+  <!-- =====================================================
+       LOGIN
+  ====================================================== -->
+
   <section id="loginScreen" class="login card">
+
     <h1>TinyTotBooks Manager</h1>
+
     <p class="muted">
-      Private book and image manager.
+      Private book, order and coupon manager.
     </p>
 
     <form id="loginForm">
+
       <label for="email">Email</label>
+
       <input
         id="email"
         type="email"
@@ -228,6 +451,7 @@
       >
 
       <label for="password">Password</label>
+
       <input
         id="password"
         type="password"
@@ -241,150 +465,445 @@
       </button>
 
       <div id="loginStatus" class="status"></div>
+
     </form>
+
   </section>
 
 
-  <!-- MANAGER -->
-  <main id="managerScreen" class="page hidden">
-<div class="manager-tabs">
-  <button id="booksTab" class="manager-tab active" type="button">
-    Books
-  </button>
+  <!-- =====================================================
+       MANAGER
+  ====================================================== -->
 
-  <button id="ordersTab" class="manager-tab" type="button">
-    Orders
-  </button>
-</div>
+  <main id="managerScreen" class="page hidden">
+
+    <!-- TABS -->
+
+    <div class="manager-tabs">
+
+      <button
+        id="booksTab"
+        class="manager-tab active"
+        type="button"
+      >
+        Books
+      </button>
+
+      <button
+        id="ordersTab"
+        class="manager-tab"
+        type="button"
+      >
+        Orders
+      </button>
+
+      <button
+        id="couponsTab"
+        class="manager-tab"
+        type="button"
+      >
+        Coupons
+      </button>
+
+    </div>
+
+
+    <!-- TOP BAR -->
+
     <div class="topbar">
+
       <div>
-        <div class="brand">TinyTotBooks Manager</div>
-        <div class="muted">Book image management</div>
+
+        <div class="brand">
+          TinyTotBooks Manager
+        </div>
+
+        <div class="muted">
+          Manage your shop
+        </div>
+
       </div>
 
-      <button id="logoutButton" class="secondary">
+      <button
+        id="logoutButton"
+        class="secondary"
+        type="button"
+      >
         Log out
       </button>
+
     </div>
 
 
-    <section class="card">
+    <!-- ===================================================
+         BOOKS PANEL
+    ==================================================== -->
 
-      <h2>Choose a book</h2>
+    <div id="booksPanel">
 
-      <select id="bookSelect">
-        <option value="">Loading books...</option>
-      </select>
+      <section class="card">
 
-<div id="bookInfo" class="muted"></div>
+        <h2>Choose a book</h2>
 
-<div id="conditionEditor" class="hidden" style="margin-top:20px;">
+        <select id="bookSelect">
+          <option value="">
+            Loading books...
+          </option>
+        </select>
 
-  <label for="conditionNotes">
-    Book condition / notes
-  </label>
+        <div id="bookInfo" class="muted"></div>
 
-  <textarea
-    id="conditionNotes"
-    rows="4"
-    placeholder="e.g. Good condition. Minor cover wear. Pages clean and intact."
-    style="
-      width:100%;
-      padding:13px 14px;
-      border:1px solid #cbd2d5;
-      border-radius:10px;
-      resize:vertical;
-      font:inherit;
-      margin-bottom:10px;
-    "
-  ></textarea>
 
-  <button
-    id="saveConditionButton"
-    class="primary"
-    type="button"
-  >
-    Save condition
-  </button>
+        <!-- CONDITION -->
 
-  <div
-    id="conditionStatus"
-    class="status"
-  ></div>
-
-</div>
-
-</section>
-
-    <section id="managerTools" class="card hidden">
-
-      <h2>Book images</h2>
-
-      <p class="hint">
-        The first image is always the main cover.
-        Use the arrows to control the order.
-        Images are automatically compressed before upload.
-      </p>
-
-      <div class="upload-area">
-
-        <strong>Add images</strong>
-
-        <p class="hint">
-          You can select multiple pictures at once.
-          JPG, PNG and WebP are supported.
-        </p>
-
-        <input
-          id="imageInput"
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          multiple
+        <div
+          id="conditionEditor"
+          class="hidden"
+          style="margin-top:20px;"
         >
 
-        <div id="uploadStatus" class="status"></div>
+          <label for="conditionNotes">
+            Book condition / notes
+          </label>
+
+          <textarea
+            id="conditionNotes"
+            rows="4"
+            placeholder="e.g. Good condition. Minor cover wear. Pages clean and intact."
+          ></textarea>
+
+          <button
+            id="saveConditionButton"
+            class="primary"
+            type="button"
+          >
+            Save condition
+          </button>
+
+          <div
+            id="conditionStatus"
+            class="status"
+          ></div>
+
+        </div>
+
+      </section>
+
+
+      <!-- BOOK IMAGES -->
+
+      <section
+        id="managerTools"
+        class="card hidden"
+      >
+
+        <h2>Book images</h2>
+
+        <p class="hint">
+          The first image is always the main cover.
+          Use the arrows to control the order.
+          Images are automatically compressed before upload.
+        </p>
+
+        <div class="upload-area">
+
+          <strong>Add images</strong>
+
+          <p class="hint">
+            You can select multiple pictures at once.
+            JPG, PNG and WebP are supported.
+          </p>
+
+          <input
+            id="imageInput"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            multiple
+          >
+
+          <div
+            id="uploadStatus"
+            class="status"
+          ></div>
+
+        </div>
+
+        <div
+          id="images"
+          class="images"
+        ></div>
+
+      </section>
+
+    </div>
+
+
+    <!-- ===================================================
+         ORDERS PANEL
+    ==================================================== -->
+
+    <section
+      id="ordersPanel"
+      class="card hidden"
+    >
+
+      <div class="topbar">
+
+        <div>
+
+          <h2>Orders</h2>
+
+          <p class="hint">
+            Confirmed and paid orders only.
+          </p>
+
+        </div>
+
+        <button
+          id="refreshOrdersButton"
+          class="secondary"
+          type="button"
+        >
+          Refresh orders
+        </button>
 
       </div>
 
-      <div id="images" class="images"></div>
+      <div
+        id="ordersStatus"
+        class="status"
+      ></div>
+
+      <div id="ordersList"></div>
 
     </section>
-<section id="ordersPanel" class="card hidden">
 
-  <div style="
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:12px;
-    flex-wrap:wrap;
-  ">
 
-    <div>
-      <h2>Orders</h2>
+    <!-- ===================================================
+         COUPONS PANEL
+    ==================================================== -->
 
-      <p class="hint">
-        Confirmed and paid orders only.
-      </p>
-    </div>
-
-    <button
-      id="refreshOrdersButton"
-      class="secondary"
-      type="button"
+    <section
+      id="couponsPanel"
+      class="card hidden"
     >
-      Refresh orders
-    </button>
 
-  </div>
+      <div class="topbar">
 
-  <div
-    id="ordersStatus"
-    class="status"
-  ></div>
+        <div>
 
-  <div id="ordersList"></div>
+          <h2>Coupons</h2>
 
-</section>
+          <p class="hint">
+            Create and manage discount codes used during checkout.
+          </p>
+
+        </div>
+
+        <button
+          id="refreshCouponsButton"
+          class="secondary"
+          type="button"
+        >
+          Refresh
+        </button>
+
+      </div>
+
+
+      <!-- COUPON FORM -->
+
+      <div>
+
+        <h3 id="couponFormTitle">
+          Add a coupon
+        </h3>
+
+        <form id="couponForm">
+
+          <div class="coupon-form-grid">
+
+            <div>
+
+              <label for="couponCode">
+                Coupon code
+              </label>
+
+              <input
+                id="couponCode"
+                type="text"
+                required
+                maxlength="50"
+                placeholder="e.g. LITTLE10"
+                autocomplete="off"
+                autocapitalize="characters"
+                spellcheck="false"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label for="couponDiscountType">
+                Discount type
+              </label>
+
+              <select id="couponDiscountType">
+
+                <option value="percentage">
+                  Percentage
+                </option>
+
+                <option value="fixed">
+                  Fixed amount
+                </option>
+
+              </select>
+
+            </div>
+
+
+            <div>
+
+              <label for="couponDiscountValue">
+                Discount value
+              </label>
+
+              <input
+                id="couponDiscountValue"
+                type="number"
+                min="0.01"
+                step="0.01"
+                required
+                placeholder="10"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label for="couponMinimumOrder">
+                Minimum order
+              </label>
+
+              <input
+                id="couponMinimumOrder"
+                type="number"
+                min="0"
+                step="0.01"
+                value="0"
+                placeholder="0"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label for="couponMaxUses">
+                Maximum uses
+              </label>
+
+              <input
+                id="couponMaxUses"
+                type="number"
+                min="1"
+                step="1"
+                placeholder="Leave blank for unlimited"
+              >
+
+            </div>
+
+
+            <div>
+
+              <label for="couponExpiresAt">
+                Expiry
+              </label>
+
+              <input
+                id="couponExpiresAt"
+                type="datetime-local"
+              >
+
+            </div>
+
+
+            <div class="full">
+
+              <label>
+                Status
+              </label>
+
+              <select id="couponActive">
+
+                <option value="true">
+                  Active
+                </option>
+
+                <option value="false">
+                  Inactive
+                </option>
+
+              </select>
+
+            </div>
+
+          </div>
+
+
+          <div class="coupon-actions">
+
+            <button
+              id="saveCouponButton"
+              class="primary"
+              type="submit"
+            >
+              Create coupon
+            </button>
+
+            <button
+              id="cancelCouponEditButton"
+              class="secondary hidden"
+              type="button"
+            >
+              Cancel edit
+            </button>
+
+          </div>
+
+          <div
+            id="couponFormStatus"
+            class="status"
+          ></div>
+
+        </form>
+
+      </div>
+
+
+      <hr class="section-divider">
+
+
+      <!-- COUPON LIST -->
+
+      <div class="coupon-list">
+
+        <h3>Your coupons</h3>
+
+        <div
+          id="couponsStatus"
+          class="status"
+        ></div>
+
+        <div id="couponsList"></div>
+
+      </div>
+
+    </section>
+
   </main>
 
 
@@ -425,6 +944,24 @@ const loginStatus =
 const logoutButton =
   document.getElementById('logoutButton');
 
+const booksTabButton =
+  document.getElementById('booksTab');
+
+const ordersTabButton =
+  document.getElementById('ordersTab');
+
+const couponsTabButton =
+  document.getElementById('couponsTab');
+
+const booksPanel =
+  document.getElementById('booksPanel');
+
+const ordersPanel =
+  document.getElementById('ordersPanel');
+
+const couponsPanel =
+  document.getElementById('couponsPanel');
+
 const bookSelect =
   document.getElementById('bookSelect');
 
@@ -443,30 +980,188 @@ const imagesContainer =
 const uploadStatus =
   document.getElementById('uploadStatus');
 
+const conditionEditor =
+  document.getElementById('conditionEditor');
+
+const conditionNotes =
+  document.getElementById('conditionNotes');
+
+const saveConditionButton =
+  document.getElementById('saveConditionButton');
+
+const conditionStatus =
+  document.getElementById('conditionStatus');
+
+const refreshOrdersButton =
+  document.getElementById('refreshOrdersButton');
+
+const ordersStatus =
+  document.getElementById('ordersStatus');
+
+const ordersList =
+  document.getElementById('ordersList');
+
+const refreshCouponsButton =
+  document.getElementById('refreshCouponsButton');
+
+const couponsStatus =
+  document.getElementById('couponsStatus');
+
+const couponsList =
+  document.getElementById('couponsList');
+
+const couponForm =
+  document.getElementById('couponForm');
+
+const couponFormTitle =
+  document.getElementById('couponFormTitle');
+
+const couponCode =
+  document.getElementById('couponCode');
+
+const couponDiscountType =
+  document.getElementById('couponDiscountType');
+
+const couponDiscountValue =
+  document.getElementById('couponDiscountValue');
+
+const couponMinimumOrder =
+  document.getElementById('couponMinimumOrder');
+
+const couponMaxUses =
+  document.getElementById('couponMaxUses');
+
+const couponExpiresAt =
+  document.getElementById('couponExpiresAt');
+
+const couponActive =
+  document.getElementById('couponActive');
+
+const saveCouponButton =
+  document.getElementById('saveCouponButton');
+
+const cancelCouponEditButton =
+  document.getElementById('cancelCouponEditButton');
+
+const couponFormStatus =
+  document.getElementById('couponFormStatus');
+
+
+/* =========================================================
+   STATE
+========================================================= */
 
 let books = [];
 let selectedBook = null;
 let currentImages = [];
+
+let coupons = [];
+let editingCouponId = null;
 
 
 /* =========================================================
    HELPERS
 ========================================================= */
 
-function setStatus(element, message, isError = false) {
+function setStatus(
+  element,
+  message,
+  isError = false
+) {
   element.textContent = message;
-  element.style.color = isError ? '#a52828' : '#687277';
+  element.style.color =
+    isError
+      ? '#a52828'
+      : '#687277';
 }
 
 
 function escapeHtml(value) {
-  return String(value ?? '').replace(/[&<>"']/g, char => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    '"': '&quot;',
-    "'": '&#039;'
-  }[char]));
+
+  return String(value ?? '')
+    .replace(/[&<>"']/g, char => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      '"': '&quot;',
+      "'": '&#039;'
+    }[char]));
+
+}
+
+
+function formatMoney(value) {
+
+  const number =
+    Number(value || 0);
+
+  return `₹${number.toFixed(2)}`;
+
+}
+
+
+function formatDate(value) {
+
+  if (!value) return '—';
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return '—';
+  }
+
+  return date.toLocaleString(
+    'en-IN'
+  );
+
+}
+
+
+function formatDateTimeLocal(value) {
+
+  if (!value) return '';
+
+  const date =
+    new Date(value);
+
+  if (
+    Number.isNaN(
+      date.getTime()
+    )
+  ) {
+    return '';
+  }
+
+  const year =
+    date.getFullYear();
+
+  const month =
+    String(
+      date.getMonth() + 1
+    ).padStart(2, '0');
+
+  const day =
+    String(
+      date.getDate()
+    ).padStart(2, '0');
+
+  const hours =
+    String(
+      date.getHours()
+    ).padStart(2, '0');
+
+  const minutes =
+    String(
+      date.getMinutes()
+    ).padStart(2, '0');
+
+  return `${year}-${month}-${day}T${hours}:${minutes}`;
+
 }
 
 
@@ -478,82 +1173,208 @@ async function checkSession() {
 
   const {
     data: { session }
-  } = await supabaseClient.auth.getSession();
+  } =
+    await supabaseClient.auth.getSession();
 
   if (session) {
     showManager();
   } else {
     showLogin();
   }
+
 }
 
 
 function showLogin() {
 
-  loginScreen.classList.remove('hidden');
-  managerScreen.classList.add('hidden');
+  loginScreen.classList.remove(
+    'hidden'
+  );
+
+  managerScreen.classList.add(
+    'hidden'
+  );
 
 }
 
 
 function showManager() {
 
-  loginScreen.classList.add('hidden');
-  managerScreen.classList.remove('hidden');
+  loginScreen.classList.add(
+    'hidden'
+  );
+
+  managerScreen.classList.remove(
+    'hidden'
+  );
 
   loadBooks();
 
 }
 
 
-loginForm.addEventListener('submit', async event => {
+loginForm.addEventListener(
+  'submit',
+  async event => {
 
-  event.preventDefault();
-
-  setStatus(loginStatus, 'Signing in...');
-
-  const email =
-    document.getElementById('email').value.trim();
-
-  const password =
-    document.getElementById('password').value;
-
-  const { error } =
-    await supabaseClient.auth.signInWithPassword({
-      email,
-      password
-    });
-
-  if (error) {
+    event.preventDefault();
 
     setStatus(
       loginStatus,
-      error.message,
-      true
+      'Signing in...'
     );
 
-    return;
+    const email =
+      document
+        .getElementById('email')
+        .value
+        .trim();
+
+    const password =
+      document
+        .getElementById('password')
+        .value;
+
+    const {
+      error
+    } =
+      await supabaseClient.auth
+        .signInWithPassword({
+          email,
+          password
+        });
+
+    if (error) {
+
+      setStatus(
+        loginStatus,
+        error.message,
+        true
+      );
+
+      return;
+    }
+
+    setStatus(
+      loginStatus,
+      ''
+    );
+
+    showManager();
+
+  }
+);
+
+
+logoutButton.addEventListener(
+  'click',
+  async () => {
+
+    await supabaseClient.auth.signOut();
+
+    selectedBook = null;
+    currentImages = [];
+
+    managerTools.classList.add(
+      'hidden'
+    );
+
+    showLogin();
+
+  }
+);
+
+
+/* =========================================================
+   TABS
+========================================================= */
+
+function activateTab(tab) {
+
+  booksPanel.classList.add(
+    'hidden'
+  );
+
+  ordersPanel.classList.add(
+    'hidden'
+  );
+
+  couponsPanel.classList.add(
+    'hidden'
+  );
+
+  booksTabButton.classList.remove(
+    'active'
+  );
+
+  ordersTabButton.classList.remove(
+    'active'
+  );
+
+  couponsTabButton.classList.remove(
+    'active'
+  );
+
+
+  if (tab === 'books') {
+
+    booksPanel.classList.remove(
+      'hidden'
+    );
+
+    booksTabButton.classList.add(
+      'active'
+    );
+
   }
 
-  setStatus(loginStatus, '');
 
-  showManager();
+  if (tab === 'orders') {
 
-});
+    ordersPanel.classList.remove(
+      'hidden'
+    );
+
+    ordersTabButton.classList.add(
+      'active'
+    );
+
+    loadOrders();
+
+  }
 
 
-logoutButton.addEventListener('click', async () => {
+  if (tab === 'coupons') {
 
-  await supabaseClient.auth.signOut();
+    couponsPanel.classList.remove(
+      'hidden'
+    );
 
-  selectedBook = null;
-  currentImages = [];
+    couponsTabButton.classList.add(
+      'active'
+    );
 
-  managerTools.classList.add('hidden');
+    loadCoupons();
 
-  showLogin();
+  }
 
-});
+}
+
+
+booksTabButton.addEventListener(
+  'click',
+  () => activateTab('books')
+);
+
+ordersTabButton.addEventListener(
+  'click',
+  () => activateTab('orders')
+);
+
+couponsTabButton.addEventListener(
+  'click',
+  () => activateTab('coupons')
+);
 
 
 /* =========================================================
@@ -568,10 +1389,13 @@ async function loadBooks() {
   const {
     data,
     error
-  } = await supabaseClient
-    .from('books')
-    .select('*')
-    .order('id', { ascending: true });
+  } =
+    await supabaseClient
+      .from('books')
+      .select('*')
+      .order('id', {
+        ascending: true
+      });
 
 
   if (error) {
@@ -585,25 +1409,33 @@ async function loadBooks() {
   }
 
 
-  books = data || [];
+  books =
+    data || [];
 
   bookSelect.innerHTML =
     '<option value="">Choose a book...</option>';
 
 
-  books.forEach(book => {
+  books.forEach(
+    book => {
 
-    const option =
-      document.createElement('option');
+      const option =
+        document.createElement(
+          'option'
+        );
 
-    option.value = book.id;
+      option.value =
+        book.id;
 
-    option.textContent =
-      `${book.title} — ${book.author}`;
+      option.textContent =
+        `${book.title} — ${book.author}`;
 
-    bookSelect.appendChild(option);
+      bookSelect.appendChild(
+        option
+      );
 
-  });
+    }
+  );
 
 }
 
@@ -612,41 +1444,56 @@ async function loadBooks() {
    BOOK SELECTION
 ========================================================= */
 
-bookSelect.addEventListener('change', async () => {
+bookSelect.addEventListener(
+  'change',
+  async () => {
 
-  const bookId =
-    bookSelect.value;
+    const bookId =
+      bookSelect.value;
 
-  if (!bookId) {
+    if (!bookId) {
 
-    selectedBook = null;
-    currentImages = [];
+      selectedBook = null;
+      currentImages = [];
 
-    bookInfo.textContent = '';
-    managerTools.classList.add('hidden');
+      bookInfo.textContent = '';
 
-    return;
-  }
+      managerTools.classList.add(
+        'hidden'
+      );
+
+      conditionEditor.classList.add(
+        'hidden'
+      );
+
+      return;
+    }
 
 
-  selectedBook =
-    books.find(
-      book => String(book.id) === String(bookId)
+    selectedBook =
+      books.find(
+        book =>
+          String(book.id) ===
+          String(bookId)
+      );
+
+
+    if (!selectedBook) return;
+
+
+    bookInfo.textContent =
+      `${selectedBook.title} · ${selectedBook.author}`;
+
+    managerTools.classList.remove(
+      'hidden'
     );
 
+    await loadBookCondition();
 
-  if (!selectedBook) return;
+    await loadImages();
 
-
-bookInfo.textContent =
-  `${selectedBook.title} · ${selectedBook.author}`;
-
-managerTools.classList.remove('hidden');
-
-await loadBookCondition();
-
-await loadImages();
-});
+  }
+);
 
 
 /* =========================================================
@@ -662,13 +1509,20 @@ async function loadImages() {
   const {
     data,
     error
-  } = await supabaseClient
-    .from('book_images')
-    .select('*')
-    .eq('book_id', selectedBook.id)
-    .order('sort_order', {
-      ascending: true
-    });
+  } =
+    await supabaseClient
+      .from('book_images')
+      .select('*')
+      .eq(
+        'book_id',
+        selectedBook.id
+      )
+      .order(
+        'sort_order',
+        {
+          ascending: true
+        }
+      );
 
 
   if (error) {
@@ -682,7 +1536,8 @@ async function loadImages() {
   }
 
 
-  currentImages = data || [];
+  currentImages =
+    data || [];
 
   renderImages();
 
@@ -705,63 +1560,78 @@ function renderImages() {
 
 
   imagesContainer.innerHTML =
-    currentImages.map((image, index) => {
+    currentImages
+      .map(
+        (image, index) => {
 
-      const isCover =
-        index === 0;
+          const isCover =
+            index === 0;
 
-      return `
-        <div class="image-card ${isCover ? 'cover-image' : ''}">
+          return `
+            <div class="image-card ${isCover ? 'cover-image' : ''}">
 
-          ${
-            isCover
-              ? '<span class="cover-badge">MAIN COVER</span>'
-              : ''
-          }
+              ${
+                isCover
+                  ? '<span class="cover-badge">MAIN COVER</span>'
+                  : ''
+              }
 
-          <img
-            src="${escapeHtml(image.image_url)}"
-            alt=""
-          >
+              <img
+                src="${escapeHtml(image.image_url)}"
+                alt=""
+              >
 
-          <div class="image-label">
-            Image ${index + 1}
-          </div>
+              <div class="image-label">
+                Image ${index + 1}
+              </div>
 
-          <div class="image-actions">
+              <div class="image-actions">
 
-            ${
-              index > 0
-                ? `<button
-                     class="secondary"
-                     onclick="moveImage(${index}, -1)">
-                     ←
-                   </button>`
-                : ''
-            }
+                ${
+                  index > 0
+                    ? `
+                      <button
+                        class="secondary"
+                        type="button"
+                        onclick="moveImage(${index}, -1)"
+                      >
+                        ←
+                      </button>
+                    `
+                    : ''
+                }
 
-            ${
-              index < currentImages.length - 1
-                ? `<button
-                     class="secondary"
-                     onclick="moveImage(${index}, 1)">
-                     →
-                   </button>`
-                : ''
-            }
+                ${
+                  index <
+                  currentImages.length - 1
+                    ? `
+                      <button
+                        class="secondary"
+                        type="button"
+                        onclick="moveImage(${index}, 1)"
+                      >
+                        →
+                      </button>
+                    `
+                    : ''
+                }
 
-            <button
-              class="danger"
-              onclick="deleteImage(${index})">
-              Delete
-            </button>
+                <button
+                  class="danger"
+                  type="button"
+                  onclick="deleteImage(${index})"
+                >
+                  Delete
+                </button>
 
-          </div>
+              </div>
 
-        </div>
-      `;
+            </div>
+          `;
 
-    }).join('');
+        }
+      )
+      .join('');
 
 }
 
@@ -772,46 +1642,72 @@ function renderImages() {
 
 async function compressImage(file) {
 
-  /*
-    TinyTotBooks image optimizer
+  const MAX_SIZE =
+    1400;
 
-    Goal:
-    - Keep book images sharp enough for reading
-    - Keep storage + egress low
-    - Never upload the original giant phone image
-  */
+  const TARGET_BYTES =
+    450 * 1024;
 
-  const MAX_SIZE = 1400;
-  const TARGET_BYTES = 450 * 1024; // ~450 KB
-  const START_QUALITY = 0.78;
-  const MIN_QUALITY = 0.62;
+  const START_QUALITY =
+    0.78;
 
-  const bitmap = await createImageBitmap(file);
+  const MIN_QUALITY =
+    0.62;
 
-  let width = bitmap.width;
-  let height = bitmap.height;
 
-  /* Never upscale small images */
-  if (width > MAX_SIZE || height > MAX_SIZE) {
+  const bitmap =
+    await createImageBitmap(file);
 
-    const scale = Math.min(
-      MAX_SIZE / width,
-      MAX_SIZE / height
-    );
+  let width =
+    bitmap.width;
 
-    width = Math.round(width * scale);
-    height = Math.round(height * scale);
+  let height =
+    bitmap.height;
+
+
+  if (
+    width > MAX_SIZE ||
+    height > MAX_SIZE
+  ) {
+
+    const scale =
+      Math.min(
+        MAX_SIZE / width,
+        MAX_SIZE / height
+      );
+
+    width =
+      Math.round(
+        width * scale
+      );
+
+    height =
+      Math.round(
+        height * scale
+      );
 
   }
 
-  const canvas = document.createElement('canvas');
 
-  canvas.width = width;
-  canvas.height = height;
+  const canvas =
+    document.createElement(
+      'canvas'
+    );
 
-  const context = canvas.getContext('2d', {
-    alpha: false
-  });
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  const context =
+    canvas.getContext(
+      '2d',
+      {
+        alpha: false
+      }
+    );
 
   context.drawImage(
     bitmap,
@@ -823,76 +1719,94 @@ async function compressImage(file) {
 
   bitmap.close();
 
-  /*
-    First compression pass.
-  */
-  let quality = START_QUALITY;
 
-  let blob = await new Promise(resolve => {
+  let quality =
+    START_QUALITY;
 
-    canvas.toBlob(
-      resolve,
-      'image/webp',
-      quality
+  let blob =
+    await new Promise(
+      resolve => {
+
+        canvas.toBlob(
+          resolve,
+          'image/webp',
+          quality
+        );
+
+      }
     );
 
-  });
 
   if (!blob) {
-    throw new Error('Could not compress image.');
+    throw new Error(
+      'Could not compress image.'
+    );
   }
 
-  /*
-    If the image is still too large,
-    gradually reduce quality.
-  */
+
   while (
     blob.size > TARGET_BYTES &&
     quality > MIN_QUALITY
   ) {
 
-    quality -= 0.04;
+    quality -=
+      0.04;
 
-    blob = await new Promise(resolve => {
+    blob =
+      await new Promise(
+        resolve => {
 
-      canvas.toBlob(
-        resolve,
-        'image/webp',
-        quality
+          canvas.toBlob(
+            resolve,
+            'image/webp',
+            quality
+          );
+
+        }
       );
 
-    });
 
     if (!blob) {
-      throw new Error('Could not compress image.');
+
+      throw new Error(
+        'Could not compress image.'
+      );
+
     }
 
   }
 
-  /*
-    If it is STILL too large at the minimum
-    quality, reduce dimensions once more.
 
-    This protects us from enormous phone photos
-    or unusually detailed scanned pages.
-  */
-  if (blob.size > TARGET_BYTES) {
+  if (
+    blob.size >
+    TARGET_BYTES
+  ) {
 
-    const scale = 0.85;
+    const scale =
+      0.85;
 
     const smallerCanvas =
-      document.createElement('canvas');
+      document.createElement(
+        'canvas'
+      );
 
     smallerCanvas.width =
-      Math.round(width * scale);
+      Math.round(
+        width * scale
+      );
 
     smallerCanvas.height =
-      Math.round(height * scale);
+      Math.round(
+        height * scale
+      );
 
     const smallerContext =
-      smallerCanvas.getContext('2d', {
-        alpha: false
-      });
+      smallerCanvas.getContext(
+        '2d',
+        {
+          alpha: false
+        }
+      );
 
     smallerContext.drawImage(
       canvas,
@@ -902,21 +1816,31 @@ async function compressImage(file) {
       smallerCanvas.height
     );
 
-    blob = await new Promise(resolve => {
 
-      smallerCanvas.toBlob(
-        resolve,
-        'image/webp',
-        MIN_QUALITY
+    blob =
+      await new Promise(
+        resolve => {
+
+          smallerCanvas.toBlob(
+            resolve,
+            'image/webp',
+            MIN_QUALITY
+          );
+
+        }
       );
 
-    });
 
     if (!blob) {
-      throw new Error('Could not compress image.');
+
+      throw new Error(
+        'Could not compress image.'
+      );
+
     }
 
   }
+
 
   return new File(
     [blob],
@@ -930,211 +1854,249 @@ async function compressImage(file) {
 
 }
 
+
 /* =========================================================
    UPLOAD IMAGES
 ========================================================= */
 
-imageInput.addEventListener('change', async () => {
+imageInput.addEventListener(
+  'change',
+  async () => {
 
-  if (!selectedBook) return;
+    if (!selectedBook) return;
 
-  const files =
-    Array.from(imageInput.files || []);
+    const files =
+      Array.from(
+        imageInput.files || []
+      );
 
-  if (!files.length) return;
-
-
-  if (
-    currentImages.length +
-    files.length >
-    10
-  ) {
-
-    setStatus(
-      uploadStatus,
-      'A book can have a maximum of 10 images.',
-      true
-    );
-
-    imageInput.value = '';
-
-    return;
-  }
+    if (!files.length) return;
 
 
-  try {
-
-    setStatus(
-      uploadStatus,
-      'Preparing images...'
-    );
-
-
-    for (
-      let i = 0;
-      i < files.length;
-      i++
+    if (
+      currentImages.length +
+      files.length >
+      10
     ) {
 
-      const originalFile =
-        files[i];
+      setStatus(
+        uploadStatus,
+        'A book can have a maximum of 10 images.',
+        true
+      );
+
+      imageInput.value = '';
+
+      return;
+    }
+
+
+    try {
+
+      setStatus(
+        uploadStatus,
+        'Preparing images...'
+      );
+
+
+      for (
+        let i = 0;
+        i < files.length;
+        i++
+      ) {
+
+        const originalFile =
+          files[i];
+
+
+        setStatus(
+          uploadStatus,
+          `Compressing image ${i + 1} of ${files.length}...`
+        );
+
+
+        const compressedFile =
+          await compressImage(
+            originalFile
+          );
+
+
+        const originalSizeMB =
+          originalFile.size /
+          (1024 * 1024);
+
+        const optimizedSizeKB =
+          compressedFile.size /
+          1024;
+
+        const savedPercent =
+          Math.max(
+            0,
+            Math.round(
+              (
+                1 -
+                compressedFile.size /
+                originalFile.size
+              ) * 100
+            )
+          );
+
+
+        const nextOrder =
+          currentImages.length + 1;
+
+
+        const storagePath =
+          `${selectedBook.id}/${compressedFile.name}`;
+
+
+        setStatus(
+          uploadStatus,
+          `Image ${i + 1} of ${files.length}: ` +
+          `${originalSizeMB.toFixed(2)} MB → ` +
+          `${optimizedSizeKB.toFixed(0)} KB ` +
+          `(${savedPercent}% smaller) — Uploading...`
+        );
+
+
+        const {
+          error: uploadError
+        } =
+          await supabaseClient
+            .storage
+            .from('book-images')
+            .upload(
+              storagePath,
+              compressedFile,
+              {
+                cacheControl:
+                  '31536000',
+                contentType:
+                  'image/webp',
+                upsert:
+                  false
+              }
+            );
+
+
+        if (uploadError) {
+          throw uploadError;
+        }
+
+
+        const {
+          data:
+            publicUrlData
+        } =
+          supabaseClient
+            .storage
+            .from('book-images')
+            .getPublicUrl(
+              storagePath
+            );
+
+
+        const imageUrl =
+          publicUrlData.publicUrl;
+
+
+        const {
+          error: rowError
+        } =
+          await supabaseClient
+            .from('book_images')
+            .insert({
+
+              book_id:
+                selectedBook.id,
+
+              image_url:
+                imageUrl,
+
+              image_type:
+                currentImages.length === 0
+                  ? 'cover'
+                  : 'gallery',
+
+              sort_order:
+                nextOrder
+
+            });
+
+
+        if (rowError) {
+
+          await supabaseClient
+            .storage
+            .from('book-images')
+            .remove([
+              storagePath
+            ]);
+
+          throw rowError;
+        }
+
+
+        currentImages.push({
+
+          book_id:
+            selectedBook.id,
+
+          image_url:
+            imageUrl,
+
+          image_type:
+            currentImages.length === 0
+              ? 'cover'
+              : 'gallery',
+
+          sort_order:
+            nextOrder,
+
+          storage_path:
+            storagePath
+
+        });
+
+      }
 
 
       setStatus(
         uploadStatus,
-        `Compressing image ${i + 1} of ${files.length}...`
+        'All images uploaded successfully.'
       );
 
+      imageInput.value = '';
 
-      const compressedFile =
-        await compressImage(originalFile);
-
-const originalSizeMB =
-  originalFile.size / (1024 * 1024);
-
-const optimizedSizeKB =
-  compressedFile.size / 1024;
-
-const savedPercent =
-  Math.max(
-    0,
-    Math.round(
-      (1 - compressedFile.size / originalFile.size) * 100
-    )
-  );
-
-const nextOrder =
-  currentImages.length + 1;
-
-const safeName =
-  compressedFile.name;
-
-const storagePath =
-  `${selectedBook.id}/${safeName}`;
-
-setStatus(
-  uploadStatus,
-  `Image ${i + 1} of ${files.length}: ` +
-  `${originalSizeMB.toFixed(2)} MB → ` +
-  `${optimizedSizeKB.toFixed(0)} KB ` +
-  `(${savedPercent}% smaller) — Uploading...`
-);
-
-      const {
-        error: uploadError
-      } =
-        await supabaseClient
-          .storage
-          .from('book-images')
-          .upload(
-            storagePath,
-            compressedFile,
-            {
-              cacheControl: '31536000',
-              contentType: 'image/webp',
-              upsert: false
-            }
-          );
+      await loadImages();
 
 
-      if (uploadError) {
-        throw uploadError;
-      }
+    } catch (error) {
 
+      console.error(error);
 
-      const {
-        data: publicUrlData
-      } =
-        supabaseClient
-          .storage
-          .from('book-images')
-          .getPublicUrl(storagePath);
+      setStatus(
+        uploadStatus,
+        `Upload failed: ${error.message}`,
+        true
+      );
 
-
-      const imageUrl =
-        publicUrlData.publicUrl;
-
-
-      const {
-        error: rowError
-      } =
-        await supabaseClient
-          .from('book_images')
-          .insert({
-            book_id: selectedBook.id,
-            image_url: imageUrl,
-            image_type:
-              currentImages.length === 0
-                ? 'cover'
-                : 'gallery',
-            sort_order: nextOrder
-          });
-
-
-      if (rowError) {
-
-        /*
-          If the database row fails after the Storage upload,
-          clean up the orphaned file so Storage doesn't slowly
-          fill with unused images.
-        */
-
-        await supabaseClient
-          .storage
-          .from('book-images')
-          .remove([storagePath]);
-
-        throw rowError;
-      }
-
-
-      currentImages.push({
-        book_id: selectedBook.id,
-        image_url: imageUrl,
-        image_type:
-          currentImages.length === 0
-            ? 'cover'
-            : 'gallery',
-        sort_order: nextOrder,
-        storage_path: storagePath
-      });
+      await loadImages();
 
     }
 
-
-    setStatus(
-      uploadStatus,
-      'All images uploaded successfully.'
-    );
-
-
-    imageInput.value = '';
-
-    await loadImages();
-
-
-  } catch (error) {
-
-    console.error(error);
-
-    setStatus(
-      uploadStatus,
-      `Upload failed: ${error.message}`,
-      true
-    );
-
-    await loadImages();
-
   }
-
-});
+);
 
 
 /* =========================================================
-   MOVE / REORDER IMAGE
+   MOVE IMAGE
 ========================================================= */
 
-async function moveImage(index, direction) {
+async function moveImage(
+  index,
+  direction
+) {
 
   const newIndex =
     index + direction;
@@ -1189,13 +2151,20 @@ async function moveImage(index, direction) {
         await supabaseClient
           .from('book_images')
           .update({
-            sort_order: newOrder,
+
+            sort_order:
+              newOrder,
+
             image_type:
               newOrder === 1
                 ? 'cover'
                 : 'gallery'
+
           })
-          .eq('id', image.id);
+          .eq(
+            'id',
+            image.id
+          );
 
 
       if (error) {
@@ -1207,13 +2176,21 @@ async function moveImage(index, direction) {
 
     currentImages =
       reordered.map(
-        (image, index) => ({
+        (
+          image,
+          index
+        ) => ({
+
           ...image,
-          sort_order: index + 1,
+
+          sort_order:
+            index + 1,
+
           image_type:
             index === 0
               ? 'cover'
               : 'gallery'
+
         })
       );
 
@@ -1253,7 +2230,6 @@ async function deleteImage(index) {
   const image =
     currentImages[index];
 
-
   if (!image) return;
 
 
@@ -1276,40 +2252,43 @@ async function deleteImage(index) {
 
   try {
 
-    /*
-      Extract the Storage path from our known URL.
-
-      Our uploader stores files like:
-      book-images/BOOK_ID/FILENAME.webp
-    */
-
     const url =
-      new URL(image.image_url);
+      new URL(
+        image.image_url
+      );
 
     const marker =
       '/storage/v1/object/public/book-images/';
 
     const markerIndex =
-      url.pathname.indexOf(marker);
+      url.pathname.indexOf(
+        marker
+      );
 
 
-    if (markerIndex !== -1) {
+    if (
+      markerIndex !== -1
+    ) {
 
       const storagePath =
         decodeURIComponent(
           url.pathname.slice(
-            markerIndex + marker.length
+            markerIndex +
+            marker.length
           )
         );
 
 
       const {
-        error: storageError
+        error:
+          storageError
       } =
         await supabaseClient
           .storage
           .from('book-images')
-          .remove([storagePath]);
+          .remove([
+            storagePath
+          ]);
 
 
       if (storageError) {
@@ -1320,23 +2299,22 @@ async function deleteImage(index) {
 
 
     const {
-      error: rowError
+      error:
+        rowError
     } =
       await supabaseClient
         .from('book_images')
         .delete()
-        .eq('id', image.id);
+        .eq(
+          'id',
+          image.id
+        );
 
 
     if (rowError) {
       throw rowError;
     }
 
-
-    /*
-      Re-number the remaining images so there are
-      never gaps in sort_order.
-    */
 
     await loadImages();
 
@@ -1353,11 +2331,15 @@ async function deleteImage(index) {
         await supabaseClient
           .from('book_images')
           .update({
-            sort_order: i + 1,
+
+            sort_order:
+              i + 1,
+
             image_type:
               i === 0
                 ? 'cover'
                 : 'gallery'
+
           })
           .eq(
             'id',
@@ -1397,33 +2379,27 @@ async function deleteImage(index) {
 
 }
 
+
 /* =========================================================
    BOOK CONDITION
 ========================================================= */
-
-const conditionEditor =
-  document.getElementById('conditionEditor');
-
-const conditionNotes =
-  document.getElementById('conditionNotes');
-
-const saveConditionButton =
-  document.getElementById('saveConditionButton');
-
-const conditionStatus =
-  document.getElementById('conditionStatus');
-
 
 async function loadBookCondition() {
 
   if (!selectedBook) return;
 
-  conditionEditor.classList.remove('hidden');
+  conditionEditor.classList.remove(
+    'hidden'
+  );
 
   conditionNotes.value =
-    selectedBook.condition_notes || '';
+    selectedBook.condition_notes ||
+    '';
 
-  setStatus(conditionStatus, '');
+  setStatus(
+    conditionStatus,
+    ''
+  );
 
 }
 
@@ -1442,15 +2418,20 @@ saveConditionButton.addEventListener(
       'Saving...'
     );
 
+
     const {
       error
     } =
       await supabaseClient
         .from('books')
         .update({
-          condition_notes: condition || null
+          condition_notes:
+            condition || null
         })
-        .eq('id', selectedBook.id);
+        .eq(
+          'id',
+          selectedBook.id
+        );
 
 
     if (error) {
@@ -1480,8 +2461,10 @@ saveConditionButton.addEventListener(
 
 
     if (index !== -1) {
+
       books[index].condition_notes =
         condition || null;
+
     }
 
 
@@ -1493,12 +2476,1243 @@ saveConditionButton.addEventListener(
   }
 );
 
+
 /* =========================================================
-   AUTH STATE LISTENER
+   ORDERS
+========================================================= */
+
+async function loadOrders() {
+
+  setStatus(
+    ordersStatus,
+    'Loading orders...'
+  );
+
+  ordersList.innerHTML = '';
+
+
+  const {
+    data: {
+      session
+    },
+    error:
+      sessionError
+  } =
+    await supabaseClient
+      .auth
+      .getSession();
+
+
+  if (sessionError) {
+
+    setStatus(
+      ordersStatus,
+      `Could not check login: ${sessionError.message}`,
+      true
+    );
+
+    return;
+  }
+
+
+  if (!session) {
+
+    setStatus(
+      ordersStatus,
+      'Please sign in again.',
+      true
+    );
+
+    return;
+  }
+
+
+  const {
+    data: orders,
+    error
+  } =
+    await supabaseClient
+      .from('orders')
+      .select(`
+        id,
+        order_number,
+        customer_name,
+        customer_phone,
+        customer_email,
+        shipping_address,
+        items,
+        subtotal,
+        shipping,
+        total,
+        currency,
+        payment_status,
+        order_status,
+        razorpay_payment_id,
+        payment_verified,
+        created_at,
+        paid_at,
+        coupon_code,
+        discount
+      `)
+      .eq(
+        'payment_status',
+        'paid'
+      )
+      .eq(
+        'order_status',
+        'confirmed'
+      )
+      .eq(
+        'payment_verified',
+        true
+      )
+      .not(
+        'razorpay_payment_id',
+        'is',
+        null
+      )
+      .not(
+        'paid_at',
+        'is',
+        null
+      )
+      .order(
+        'paid_at',
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      'Orders query error:',
+      error
+    );
+
+    setStatus(
+      ordersStatus,
+      `Could not load orders: ${error.message}`,
+      true
+    );
+
+    return;
+  }
+
+
+  if (
+    !orders ||
+    orders.length === 0
+  ) {
+
+    setStatus(
+      ordersStatus,
+      'No confirmed paid orders yet.'
+    );
+
+    return;
+  }
+
+
+  setStatus(
+    ordersStatus,
+    `${orders.length} confirmed order${orders.length === 1 ? '' : 's'}`
+  );
+
+
+  ordersList.innerHTML =
+    orders
+      .map(
+        order => {
+
+          const items =
+            Array.isArray(
+              order.items
+            )
+              ? order.items
+              : [];
+
+
+          const itemHtml =
+            items.length
+              ? items
+                  .map(
+                    item => `
+
+                      <li>
+
+                        <strong>
+                          ${escapeHtml(
+                            item.title ||
+                            'Book'
+                          )}
+                        </strong>
+
+                        ×
+                        ${Number(
+                          item.quantity ??
+                          item.qty ??
+                          1
+                        )}
+
+                        —
+                        ${formatMoney(
+                          item.line_total ??
+                          (
+                            (item.unit_price || 0) *
+                            (
+                              item.quantity ??
+                              item.qty ??
+                              1
+                            )
+                          )
+                        )}
+
+                      </li>
+
+                    `
+                  )
+                  .join('')
+              : '<li>No item details stored.</li>';
+
+
+          const paidAt =
+            formatDate(
+              order.paid_at
+            );
+
+
+          return `
+
+            <article class="order-card">
+
+              <div class="order-head">
+
+                <div>
+
+                  <h3>
+                    ${escapeHtml(
+                      order.order_number ||
+                      `Order #${order.id}`
+                    )}
+                  </h3>
+
+                  <div class="hint">
+                    Paid: ${escapeHtml(paidAt)}
+                  </div>
+
+                </div>
+
+                <div class="order-total">
+                  ${formatMoney(
+                    order.total
+                  )}
+                </div>
+
+              </div>
+
+
+              <hr class="order-divider">
+
+
+              <p>
+                <strong>Customer:</strong>
+                ${escapeHtml(
+                  order.customer_name ||
+                  '—'
+                )}
+              </p>
+
+
+              <p>
+                <strong>Phone:</strong>
+                ${escapeHtml(
+                  order.customer_phone ||
+                  '—'
+                )}
+              </p>
+
+
+              <p>
+                <strong>Email:</strong>
+                ${escapeHtml(
+                  order.customer_email ||
+                  '—'
+                )}
+              </p>
+
+
+              <p>
+                <strong>Delivery address:</strong><br>
+                ${escapeHtml(
+                  order.shipping_address ||
+                  '—'
+                ).replace(
+                  /\n/g,
+                  '<br>'
+                )}
+              </p>
+
+
+              <p>
+                <strong>Books ordered:</strong>
+              </p>
+
+
+              <ul>
+                ${itemHtml}
+              </ul>
+
+
+              ${
+                order.coupon_code
+                  ? `
+                    <p>
+                      <strong>Coupon:</strong>
+                      ${escapeHtml(
+                        order.coupon_code
+                      )}
+                      ${
+                        order.discount != null
+                          ? ` — ${formatMoney(order.discount)} off`
+                          : ''
+                      }
+                    </p>
+                  `
+                  : ''
+              }
+
+
+              <div style="margin-top:16px;">
+
+                <div>
+                  Subtotal:
+                  ${formatMoney(
+                    order.subtotal
+                  )}
+                </div>
+
+                <div>
+                  Shipping:
+                  ${formatMoney(
+                    order.shipping
+                  )}
+                </div>
+
+                <div
+                  style="
+                    font-size:1.1rem;
+                    margin-top:5px;
+                  "
+                >
+                  <strong>
+                    Total paid:
+                    ${formatMoney(
+                      order.total
+                    )}
+                  </strong>
+                </div>
+
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      )
+      .join('');
+
+}
+
+
+refreshOrdersButton.addEventListener(
+  'click',
+  loadOrders
+);
+
+
+/* =========================================================
+   COUPONS
+========================================================= */
+
+async function loadCoupons() {
+
+  setStatus(
+    couponsStatus,
+    'Loading coupons...'
+  );
+
+  couponsList.innerHTML = '';
+
+
+  const {
+    data,
+    error
+  } =
+    await supabaseClient
+      .from('coupons')
+      .select(`
+        id,
+        code,
+        discount_type,
+        discount_value,
+        minimum_order,
+        max_uses,
+        used_count,
+        active,
+        expires_at,
+        created_at
+      `)
+      .order(
+        'created_at',
+        {
+          ascending: false
+        }
+      );
+
+
+  if (error) {
+
+    console.error(
+      'Coupon lookup failed:',
+      error
+    );
+
+    setStatus(
+      couponsStatus,
+      `Could not load coupons: ${error.message}`,
+      true
+    );
+
+    return;
+  }
+
+
+  coupons =
+    data || [];
+
+
+  if (!coupons.length) {
+
+    setStatus(
+      couponsStatus,
+      ''
+    );
+
+    couponsList.innerHTML =
+      `
+        <div class="coupon-empty">
+          No coupons yet.
+        </div>
+      `;
+
+    return;
+  }
+
+
+  setStatus(
+    couponsStatus,
+    `${coupons.length} coupon${coupons.length === 1 ? '' : 's'}`
+  );
+
+
+  renderCoupons();
+
+}
+
+
+function renderCoupons() {
+
+  if (!coupons.length) {
+
+    couponsList.innerHTML =
+      `
+        <div class="coupon-empty">
+          No coupons yet.
+        </div>
+      `;
+
+    return;
+  }
+
+
+  couponsList.innerHTML =
+    coupons
+      .map(
+        coupon => {
+
+          const active =
+            coupon.active === true;
+
+
+          const discountType =
+            coupon.discount_type ===
+            'percentage'
+              ? 'Percentage'
+              : 'Fixed amount';
+
+
+          const discountDisplay =
+            coupon.discount_type ===
+            'percentage'
+              ? `${Number(
+                  coupon.discount_value || 0
+                )}%`
+              : formatMoney(
+                  coupon.discount_value
+                );
+
+
+          const maxUses =
+            coupon.max_uses == null
+              ? 'Unlimited'
+              : String(
+                  coupon.max_uses
+                );
+
+
+          const usedCount =
+            Number(
+              coupon.used_count || 0
+            );
+
+
+          return `
+
+            <article
+              class="coupon-card ${active ? '' : 'inactive'}"
+            >
+
+              <div class="coupon-head">
+
+                <div>
+
+                  <div class="coupon-code">
+                    ${escapeHtml(
+                      coupon.code
+                    )}
+                  </div>
+
+                  <span
+                    class="coupon-badge ${
+                      active
+                        ? 'active'
+                        : 'inactive'
+                    }"
+                  >
+                    ${
+                      active
+                        ? 'ACTIVE'
+                        : 'INACTIVE'
+                    }
+                  </span>
+
+                </div>
+
+              </div>
+
+
+              <div class="coupon-details">
+
+                <div class="coupon-detail">
+
+                  <small>
+                    Discount
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      discountDisplay
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div class="coupon-detail">
+
+                  <small>
+                    Type
+                  </small>
+
+                  <strong>
+                    ${escapeHtml(
+                      discountType
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div class="coupon-detail">
+
+                  <small>
+                    Minimum order
+                  </small>
+
+                  <strong>
+                    ${formatMoney(
+                      coupon.minimum_order
+                    )}
+                  </strong>
+
+                </div>
+
+
+                <div class="coupon-detail">
+
+                  <small>
+                    Uses
+                  </small>
+
+                  <strong>
+                    ${usedCount} / ${escapeHtml(
+                      maxUses
+                    )}
+                  </strong>
+
+                </div>
+
+              </div>
+
+
+              <div class="hint" style="margin-top:14px;">
+
+                ${
+                  coupon.expires_at
+                    ? `Expires: ${escapeHtml(
+                        formatDate(
+                          coupon.expires_at
+                        )
+                      )}`
+                    : 'No expiry date'
+                }
+
+              </div>
+
+
+              <div class="coupon-card-actions">
+
+                <button
+                  class="secondary"
+                  type="button"
+                  onclick="editCoupon(${coupon.id})"
+                >
+                  Edit
+                </button>
+
+
+                <button
+                  class="${
+                    active
+                      ? 'secondary'
+                      : 'success'
+                  }"
+                  type="button"
+                  onclick="toggleCoupon(${coupon.id})"
+                >
+                  ${
+                    active
+                      ? 'Deactivate'
+                      : 'Activate'
+                  }
+                </button>
+
+
+                <button
+                  class="danger"
+                  type="button"
+                  onclick="deleteCoupon(${coupon.id})"
+                >
+                  Delete
+                </button>
+
+              </div>
+
+            </article>
+
+          `;
+
+        }
+      )
+      .join('');
+
+}
+
+
+/* =========================================================
+   RESET COUPON FORM
+========================================================= */
+
+function resetCouponForm() {
+
+  editingCouponId =
+    null;
+
+  couponForm.reset();
+
+  couponDiscountType.value =
+    'percentage';
+
+  couponMinimumOrder.value =
+    '0';
+
+  couponActive.value =
+    'true';
+
+  couponFormTitle.textContent =
+    'Add a coupon';
+
+  saveCouponButton.textContent =
+    'Create coupon';
+
+  cancelCouponEditButton.classList.add(
+    'hidden'
+  );
+
+  setStatus(
+    couponFormStatus,
+    ''
+  );
+
+}
+
+
+/* =========================================================
+   EDIT COUPON
+========================================================= */
+
+function editCoupon(id) {
+
+  const coupon =
+    coupons.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!coupon) return;
+
+
+  editingCouponId =
+    coupon.id;
+
+
+  couponFormTitle.textContent =
+    `Edit ${coupon.code}`;
+
+
+  couponCode.value =
+    coupon.code || '';
+
+
+  couponDiscountType.value =
+    coupon.discount_type ||
+    'percentage';
+
+
+  couponDiscountValue.value =
+    coupon.discount_value ??
+    '';
+
+
+  couponMinimumOrder.value =
+    coupon.minimum_order ??
+    '0';
+
+
+  couponMaxUses.value =
+    coupon.max_uses ??
+    '';
+
+
+  couponExpiresAt.value =
+    formatDateTimeLocal(
+      coupon.expires_at
+    );
+
+
+  couponActive.value =
+    coupon.active
+      ? 'true'
+      : 'false';
+
+
+  saveCouponButton.textContent =
+    'Save changes';
+
+
+  cancelCouponEditButton.classList.remove(
+    'hidden'
+  );
+
+
+  setStatus(
+    couponFormStatus,
+    'Editing coupon.'
+  );
+
+
+  couponForm.scrollIntoView({
+    behavior: 'smooth',
+    block: 'start'
+  });
+
+}
+
+
+cancelCouponEditButton.addEventListener(
+  'click',
+  resetCouponForm
+);
+
+
+/* =========================================================
+   CREATE / UPDATE COUPON
+========================================================= */
+
+couponForm.addEventListener(
+  'submit',
+  async event => {
+
+    event.preventDefault();
+
+
+    const code =
+      couponCode.value
+        .trim()
+        .toUpperCase();
+
+
+    const discountType =
+      couponDiscountType.value;
+
+
+    const discountValue =
+      Number(
+        couponDiscountValue.value
+      );
+
+
+    const minimumOrder =
+      Number(
+        couponMinimumOrder.value ||
+        0
+      );
+
+
+    const maxUsesRaw =
+      couponMaxUses.value
+        .trim();
+
+
+    const maxUses =
+      maxUsesRaw === ''
+        ? null
+        : Number(
+            maxUsesRaw
+          );
+
+
+    const expiresAtRaw =
+      couponExpiresAt.value
+        .trim();
+
+
+    const expiresAt =
+      expiresAtRaw
+        ? new Date(
+            expiresAtRaw
+          ).toISOString()
+        : null;
+
+
+    const active =
+      couponActive.value ===
+      'true';
+
+
+    /* =========================
+       VALIDATION
+    ========================= */
+
+    if (!code) {
+
+      setStatus(
+        couponFormStatus,
+        'Enter a coupon code.',
+        true
+      );
+
+      return;
+    }
+
+
+    if (
+      !Number.isFinite(
+        discountValue
+      ) ||
+      discountValue <= 0
+    ) {
+
+      setStatus(
+        couponFormStatus,
+        'Discount value must be greater than zero.',
+        true
+      );
+
+      return;
+    }
+
+
+    if (
+      discountType ===
+      'percentage' &&
+      discountValue > 100
+    ) {
+
+      setStatus(
+        couponFormStatus,
+        'Percentage discount cannot exceed 100%.',
+        true
+      );
+
+      return;
+    }
+
+
+    if (
+      !Number.isFinite(
+        minimumOrder
+      ) ||
+      minimumOrder < 0
+    ) {
+
+      setStatus(
+        couponFormStatus,
+        'Minimum order cannot be negative.',
+        true
+      );
+
+      return;
+    }
+
+
+    if (
+      maxUses !== null &&
+      (
+        !Number.isInteger(
+          maxUses
+        ) ||
+        maxUses < 1
+      )
+    ) {
+
+      setStatus(
+        couponFormStatus,
+        'Maximum uses must be a whole number greater than zero.',
+        true
+      );
+
+      return;
+    }
+
+
+    if (
+      expiresAtRaw &&
+      (
+        !expiresAt ||
+        Number.isNaN(
+          new Date(
+            expiresAtRaw
+          ).getTime()
+        )
+      )
+    ) {
+
+      setStatus(
+        couponFormStatus,
+        'Invalid expiry date.',
+        true
+      );
+
+      return;
+    }
+
+
+    setStatus(
+      couponFormStatus,
+      editingCouponId
+        ? 'Saving changes...'
+        : 'Creating coupon...'
+    );
+
+
+    const payload = {
+
+      code,
+
+      discount_type:
+        discountType,
+
+      discount_value:
+        discountValue,
+
+      minimum_order:
+        minimumOrder,
+
+      max_uses:
+        maxUses,
+
+      active,
+
+      expires_at:
+        expiresAt
+
+    };
+
+
+    let error;
+
+
+    if (editingCouponId) {
+
+      ({
+        error
+      } =
+        await supabaseClient
+          .from('coupons')
+          .update(payload)
+          .eq(
+            'id',
+            editingCouponId
+          ));
+
+    } else {
+
+      ({
+        error
+      } =
+        await supabaseClient
+          .from('coupons')
+          .insert(payload));
+
+    }
+
+
+    if (error) {
+
+      console.error(
+        'Coupon save error:',
+        error
+      );
+
+
+      let message =
+        error.message ||
+        'Could not save coupon.';
+
+
+      if (
+        error.code ===
+        '23505'
+      ) {
+
+        message =
+          'A coupon with that code already exists.';
+
+      }
+
+
+      setStatus(
+        couponFormStatus,
+        message,
+        true
+      );
+
+      return;
+    }
+
+
+    setStatus(
+      couponFormStatus,
+      editingCouponId
+        ? 'Coupon updated.'
+        : 'Coupon created.'
+    );
+
+
+    resetCouponForm();
+
+    await loadCoupons();
+
+  }
+);
+
+
+/* =========================================================
+   TOGGLE COUPON
+========================================================= */
+
+async function toggleCoupon(id) {
+
+  const coupon =
+    coupons.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!coupon) return;
+
+
+  const newActive =
+    !coupon.active;
+
+
+  const confirmed =
+    confirm(
+      newActive
+        ? `Activate coupon ${coupon.code}?`
+        : `Deactivate coupon ${coupon.code}?`
+    );
+
+
+  if (!confirmed) return;
+
+
+  setStatus(
+    couponsStatus,
+    'Updating coupon...'
+  );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from('coupons')
+      .update({
+        active:
+          newActive
+      })
+      .eq(
+        'id',
+        coupon.id
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    setStatus(
+      couponsStatus,
+      `Could not update coupon: ${error.message}`,
+      true
+    );
+
+    return;
+  }
+
+
+  await loadCoupons();
+
+}
+
+
+/* =========================================================
+   DELETE COUPON
+========================================================= */
+
+async function deleteCoupon(id) {
+
+  const coupon =
+    coupons.find(
+      item =>
+        String(item.id) ===
+        String(id)
+    );
+
+
+  if (!coupon) return;
+
+
+  const confirmed =
+    confirm(
+      `Delete coupon ${coupon.code}? This cannot be undone.`
+    );
+
+
+  if (!confirmed) return;
+
+
+  setStatus(
+    couponsStatus,
+    'Deleting coupon...'
+  );
+
+
+  const {
+    error
+  } =
+    await supabaseClient
+      .from('coupons')
+      .delete()
+      .eq(
+        'id',
+        coupon.id
+      );
+
+
+  if (error) {
+
+    console.error(error);
+
+    setStatus(
+      couponsStatus,
+      `Could not delete coupon: ${error.message}`,
+      true
+    );
+
+    return;
+  }
+
+
+  if (
+    String(editingCouponId) ===
+    String(coupon.id)
+  ) {
+
+    resetCouponForm();
+
+  }
+
+
+  await loadCoupons();
+
+}
+
+
+refreshCouponsButton.addEventListener(
+  'click',
+  loadCoupons
+);
+
+
+/* =========================================================
+   AUTH STATE
 ========================================================= */
 
 supabaseClient.auth.onAuthStateChange(
-  (event, session) => {
+  (
+    event,
+    session
+  ) => {
 
     if (session) {
       showManager();
@@ -1509,266 +3723,7 @@ supabaseClient.auth.onAuthStateChange(
   }
 );
 
-/* =========================================================
-   ORDERS TAB
-========================================================= */
 
-const booksTabButton = document.getElementById('booksTab');
-const ordersTabButton = document.getElementById('ordersTab');
-
-const ordersPanel = document.getElementById('ordersPanel');
-const refreshOrdersButton =
-  document.getElementById('refreshOrdersButton');
-
-const ordersStatus =
-  document.getElementById('ordersStatus');
-
-const ordersList =
-  document.getElementById('ordersList');
-
-
-async function loadOrders() {
-
-  ordersStatus.textContent = 'Loading orders...';
-  ordersList.innerHTML = '';
-
-  const {
-    data: { session },
-    error: sessionError
-  } = await supabaseClient.auth.getSession();
-
-  if (sessionError) {
-    ordersStatus.textContent =
-      `Could not check login: ${sessionError.message}`;
-    return;
-  }
-
-  if (!session) {
-    ordersStatus.textContent =
-      'Please sign in again.';
-    return;
-  }
-
-  const {
-    data: orders,
-    error
-  } = await supabaseClient
-    .from('orders')
-.select(`
-  id,
-  order_number,
-  customer_name,
-  customer_phone,
-  customer_email,
-  shipping_address,
-  items,
-  subtotal,
-  shipping,
-  total,
-  currency,
-  payment_status,
-  order_status,
-  razorpay_payment_id,
-  payment_verified,
-  created_at,
-  paid_at
-`)
-    .eq('payment_status', 'paid')
-.eq('order_status', 'confirmed')
-.eq('payment_verified', true)
-.not('razorpay_payment_id', 'is', null)
-.not('paid_at', 'is', null)
-.order('paid_at', { ascending: false });
-  if (error) {
-
-    console.error('Orders query error:', error);
-
-    ordersStatus.textContent =
-      `Could not load orders: ${error.message}`;
-
-    return;
-  }
-
-  if (!orders || orders.length === 0) {
-
-    ordersStatus.textContent =
-      'No confirmed paid orders yet.';
-
-    return;
-  }
-
-  ordersStatus.textContent =
-    `${orders.length} confirmed order${orders.length === 1 ? '' : 's'}`;
-
-  ordersList.innerHTML = orders.map(order => {
-
-    const items =
-      Array.isArray(order.items)
-        ? order.items
-        : [];
-
-    const books = items.length
-      ? items.map(item => `
-          <li>
-            <strong>
-              ${escapeHtml(item.title || 'Book')}
-            </strong>
-            × ${Number(item.quantity ?? item.qty ?? 1)}
-            — ₹${Number(
-              item.line_total ??
-              ((item.unit_price || 0) *
-              (item.quantity ?? item.qty ?? 1))
-            ).toFixed(2)}
-          </li>
-        `).join('')
-      : '<li>No item details stored.</li>';
-
-    const paidAt = order.paid_at
-      ? new Date(order.paid_at).toLocaleString('en-IN')
-      : '—';
-
-    return `
-      <article class="card"
-        style="margin-top:16px;margin-bottom:0;">
-
-        <div style="
-          display:flex;
-          justify-content:space-between;
-          gap:12px;
-          align-items:flex-start;
-          flex-wrap:wrap;
-        ">
-
-          <div>
-
-            <h3 style="margin-bottom:6px;">
-              ${escapeHtml(
-                order.order_number ||
-                `Order #${order.id}`
-              )}
-            </h3>
-
-            <div class="hint">
-              Paid: ${escapeHtml(paidAt)}
-            </div>
-
-          </div>
-
-          <strong style="font-size:1.15rem;">
-            ₹${Number(order.total || 0).toFixed(2)}
-          </strong>
-
-        </div>
-
-        <hr style="
-          border:0;
-          border-top:1px solid #e5e5e5;
-          margin:18px 0;
-        ">
-
-        <p>
-          <strong>Customer:</strong>
-          ${escapeHtml(order.customer_name || '—')}
-        </p>
-
-        <p>
-          <strong>Phone:</strong>
-          ${escapeHtml(order.customer_phone || '—')}
-        </p>
-
-        <p>
-          <strong>Email:</strong>
-          ${escapeHtml(order.customer_email || '—')}
-        </p>
-
-        <p>
-          <strong>Delivery address:</strong><br>
-          ${escapeHtml(
-            order.shipping_address || '—'
-          ).replace(/\n/g, '<br>')}
-        </p>
-
-        <p>
-          <strong>Books ordered:</strong>
-        </p>
-
-        <ul>
-          ${books}
-        </ul>
-
-        <div style="margin-top:16px;">
-
-          <div>
-            Subtotal:
-            ₹${Number(order.subtotal || 0).toFixed(2)}
-          </div>
-
-          <div>
-            Shipping:
-            ₹${Number(order.shipping || 0).toFixed(2)}
-          </div>
-
-          <div style="
-            font-size:1.1rem;
-            margin-top:5px;
-          ">
-            <strong>
-              Total paid:
-              ₹${Number(order.total || 0).toFixed(2)}
-            </strong>
-          </div>
-
-        </div>
-
-      </article>
-    `;
-
-  }).join('');
-}
-
-
-ordersTabButton.addEventListener(
-  'click',
-  async () => {
-
-    booksTabButton.classList.remove('active');
-    ordersTabButton.classList.add('active');
-
-    document
-      .querySelectorAll('#managerScreen > .card')
-      .forEach(section => {
-        section.classList.add('hidden');
-      });
-
-    ordersPanel.classList.remove('hidden');
-
-    await loadOrders();
-  }
-);
-
-
-booksTabButton.addEventListener(
-  'click',
-  () => {
-
-    booksTabButton.classList.add('active');
-    ordersTabButton.classList.remove('active');
-
-    document
-      .querySelectorAll('#managerScreen > .card')
-      .forEach(section => {
-        section.classList.remove('hidden');
-      });
-
-    ordersPanel.classList.add('hidden');
-  }
-);
-
-
-refreshOrdersButton.addEventListener(
-  'click',
-  loadOrders
-);
 /* =========================================================
    START
 ========================================================= */

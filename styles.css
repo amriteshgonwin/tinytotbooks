@@ -4798,3 +4798,1232 @@ footer h4{
   }
 
 }
+
+/* =========================================================
+   TINYTOTBOOKS MANAGER
+   ========================================================= */
+
+.manager-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 22px;
+  padding: 5px;
+  background: #eee8dc;
+  border-radius: 14px;
+  width: fit-content;
+}
+
+.manager-tab {
+  background: transparent;
+  color: #687277;
+  padding: 10px 18px;
+  border-radius: 10px;
+  transition:
+    background .2s ease,
+    color .2s ease,
+    transform .15s ease;
+}
+
+.manager-tab:hover {
+  transform: translateY(-1px);
+}
+
+.manager-tab.active {
+  background: #24343d;
+  color: #fff;
+}
+
+#managerScreen {
+  animation: managerFadeIn .35s ease both;
+}
+
+#managerScreen .card {
+  animation: managerCardIn .35s ease both;
+}
+
+#managerScreen .card:nth-child(2) {
+  animation-delay: .04s;
+}
+
+#managerScreen .card:nth-child(3) {
+  animation-delay: .08s;
+}
+
+#managerScreen .card:nth-child(4) {
+  animation-delay: .12s;
+}
+
+/* Manager login */
+
+#loginScreen {
+  animation: managerFadeIn .4s ease both;
+}
+
+#loginScreen button {
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+}
+
+#loginScreen button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(36, 52, 61, .14);
+}
+
+#loginScreen button:active {
+  transform: translateY(0);
+}
+
+/* Inputs */
+
+#managerScreen input,
+#managerScreen select,
+#managerScreen textarea,
+#loginScreen input {
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    background .18s ease;
+}
+
+#managerScreen input:focus,
+#managerScreen select:focus,
+#managerScreen textarea:focus,
+#loginScreen input:focus {
+  outline: none;
+  border-color: #24343d;
+  box-shadow: 0 0 0 3px rgba(36, 52, 61, .08);
+}
+
+/* Upload area */
+
+#managerScreen .upload-area {
+  transition:
+    border-color .2s ease,
+    background .2s ease,
+    transform .2s ease;
+}
+
+#managerScreen .upload-area:hover {
+  border-color: #24343d;
+  background: #fcfbf8;
+}
+
+/* Image cards */
+
+#managerScreen .image-card {
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+#managerScreen .image-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 25px rgba(30, 40, 45, .10);
+}
+
+#managerScreen .image-card img {
+  transition: transform .25s ease;
+}
+
+#managerScreen .image-card:hover img {
+  transform: scale(1.015);
+}
+
+/* Main cover */
+
+#managerScreen .image-card.cover-image {
+  box-shadow: 0 0 0 1px rgba(226, 165, 29, .08);
+}
+
+/* Manager buttons */
+
+#managerScreen button {
+  transition:
+    transform .16s ease,
+    box-shadow .16s ease,
+    opacity .16s ease;
+}
+
+#managerScreen button:hover {
+  transform: translateY(-1px);
+}
+
+#managerScreen button:active {
+  transform: translateY(0);
+}
+
+#managerScreen .danger:hover {
+  box-shadow: 0 5px 14px rgba(141, 34, 34, .10);
+}
+
+/* Orders */
+
+#ordersList > article {
+  animation: managerCardIn .3s ease both;
+}
+
+#ordersList > article:hover {
+  box-shadow: 0 12px 34px rgba(30, 40, 45, .11);
+}
+
+#ordersList hr {
+  opacity: .7;
+}
+
+/* Status */
+
+#managerScreen .status {
+  transition: opacity .2s ease;
+}
+
+/* Manager animations */
+
+@keyframes managerFadeIn {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes managerCardIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   CHECKOUT
+   ========================================================= */
+
+#checkoutDialog {
+  width: min(720px, calc(100vw - 24px));
+  max-width: 720px;
+  max-height: 90vh;
+  padding: 0;
+  border: 0;
+  border-radius: 22px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(25, 35, 40, .22);
+  animation: checkoutDialogIn .3s ease both;
+}
+
+#checkoutDialog::backdrop {
+  background: rgba(20, 29, 34, .42);
+  backdrop-filter: blur(4px);
+}
+
+#checkoutDialog .dialog-head {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding: 20px 24px;
+  background: rgba(255, 255, 255, .94);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid #eee;
+}
+
+#checkoutDialog .checkout-form,
+#checkoutDialog > .muted,
+#checkoutDialog > .form-notice {
+  margin-left: 24px;
+  margin-right: 24px;
+}
+
+#checkoutDialog > .muted {
+  margin-top: 18px;
+}
+
+/* Checkout sections */
+
+.checkout-section {
+  margin: 22px 0;
+  padding: 20px;
+  border: 1px solid #e8e3da;
+  border-radius: 17px;
+  background: #fcfbf8;
+  animation: checkoutSectionIn .35s ease both;
+}
+
+.checkout-section:nth-of-type(2) {
+  animation-delay: .04s;
+}
+
+.checkout-section:nth-of-type(3) {
+  animation-delay: .08s;
+}
+
+.checkout-section-head {
+  margin-bottom: 17px;
+}
+
+.checkout-section-head .eyebrow {
+  display: block;
+  margin-bottom: 5px;
+  font-size: .76rem;
+  font-weight: 800;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  opacity: .65;
+}
+
+.checkout-section-head h3 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+/* Form fields */
+
+.checkout-form label {
+  display: block;
+  margin-bottom: 16px;
+  font-weight: 700;
+}
+
+.checkout-form input {
+  display: block;
+  width: 100%;
+  margin-top: 7px;
+  margin-bottom: 0;
+  padding: 13px 14px;
+  border: 1px solid #d5d8d6;
+  border-radius: 11px;
+  background: #fff;
+  transition:
+    border-color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+.checkout-form input:hover {
+  border-color: #aeb7b5;
+}
+
+.checkout-form input:focus {
+  outline: none;
+  border-color: #24343d;
+  box-shadow: 0 0 0 3px rgba(36, 52, 61, .08);
+  transform: translateY(-1px);
+}
+
+/* Address */
+
+.checkout-address-note {
+  margin-bottom: 20px;
+  padding: 15px;
+  border-radius: 13px;
+  background: #f1eee6;
+}
+
+.checkout-address-note p {
+  margin: 7px 0 12px;
+  line-height: 1.55;
+}
+
+.checkout-address-example {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(36, 52, 61, .10);
+  font-size: .88rem;
+  line-height: 1.5;
+}
+
+.checkout-field-row {
+  display: grid;
+  grid-template-columns: 1fr 180px;
+  gap: 14px;
+}
+
+/* Coupon */
+
+.checkout-coupon-row {
+  display: flex;
+  gap: 9px;
+  align-items: stretch;
+}
+
+.checkout-coupon-row input {
+  flex: 1;
+  min-width: 0;
+}
+
+.checkout-coupon-row button {
+  flex: 0 0 auto;
+  white-space: nowrap;
+  margin-top: 7px;
+  margin-bottom: 0;
+}
+
+#checkoutCouponMessage {
+  min-height: 22px;
+  margin-top: 9px;
+  transition:
+    opacity .2s ease,
+    transform .2s ease;
+}
+
+/* Payment */
+
+.payment-box {
+  display: flex;
+  align-items: center;
+  gap: 13px;
+  margin: 20px 0;
+  padding: 16px;
+  border: 1px solid #dfe7e4;
+  border-radius: 14px;
+  background: #f5f8f6;
+  animation: checkoutSectionIn .4s ease both;
+}
+
+.payment-box > span {
+  font-size: 1.35rem;
+}
+
+.payment-box b {
+  display: block;
+  margin-bottom: 3px;
+}
+
+.payment-box p {
+  margin: 0;
+  color: #687277;
+  font-size: .9rem;
+  line-height: 1.45;
+}
+
+/* Pay button */
+
+#checkoutForm > button[type="submit"] {
+  width: 100%;
+  min-height: 52px;
+  margin-bottom: 24px;
+  font-size: 1rem;
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    opacity .18s ease;
+}
+
+#checkoutForm > button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 25px rgba(36, 52, 61, .17);
+}
+
+#checkoutForm > button[type="submit"]:active {
+  transform: translateY(0);
+}
+
+#checkoutForm > button[type="submit"]:disabled {
+  cursor: wait;
+  opacity: .65;
+  transform: none;
+}
+
+/* Close button */
+
+#checkoutDialog .close {
+  transition:
+    transform .18s ease,
+    background .18s ease;
+}
+
+#checkoutDialog .close:hover {
+  transform: rotate(5deg);
+}
+
+/* Notice */
+
+#checkoutNotice {
+  min-height: 24px;
+  padding-bottom: 20px;
+}
+
+/* Checkout animations */
+
+@keyframes checkoutDialogIn {
+  from {
+    opacity: 0;
+    transform: translateY(15px) scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes checkoutSectionIn {
+  from {
+    opacity: 0;
+    transform: translateY(7px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+
+/* =========================================================
+   MOBILE CHECKOUT
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+  #checkoutDialog {
+    width: calc(100vw - 12px);
+    max-height: 94vh;
+    border-radius: 18px;
+  }
+
+  #checkoutDialog .dialog-head {
+    padding: 16px 18px;
+  }
+
+  #checkoutDialog .checkout-form,
+  #checkoutDialog > .muted,
+  #checkoutDialog > .form-notice {
+    margin-left: 16px;
+    margin-right: 16px;
+  }
+
+  .checkout-section {
+    padding: 16px;
+    margin: 17px 0;
+    border-radius: 15px;
+  }
+
+  .checkout-field-row {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  .checkout-coupon-row {
+    flex-direction: column;
+  }
+
+  .checkout-coupon-row button {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .payment-box {
+    padding: 14px;
+  }
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  #managerScreen,
+  #managerScreen .card,
+  #ordersList > article,
+  #loginScreen,
+  #checkoutDialog,
+  .checkout-section,
+  .payment-box {
+    animation: none !important;
+  }
+
+  #managerScreen button,
+  #managerScreen .image-card,
+  #checkoutForm input,
+  #checkoutForm button {
+    transition: none !important;
+  }
+}
+/* =========================================================
+   TINYTOTBOOKS — CHECKOUT DIALOG FINAL FIX
+   ========================================================= */
+
+/* Force the native dialog itself to become the scroll container */
+
+#checkoutDialog {
+  position: fixed !important;
+
+  top: 12px !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  transform: translateX(-50%) !important;
+
+  width: min(900px, calc(100vw - 24px)) !important;
+
+  height: calc(100vh - 24px) !important;
+  max-height: calc(100vh - 24px) !important;
+  min-height: 0 !important;
+
+  margin: 0 !important;
+
+  padding: 0 !important;
+
+  border: 0 !important;
+  border-radius: 26px !important;
+
+  overflow-y: scroll !important;
+  overflow-x: hidden !important;
+
+  overscroll-behavior: contain;
+
+  box-sizing: border-box !important;
+
+  background: #fff;
+
+  -webkit-overflow-scrolling: touch;
+
+  scrollbar-width: thin;
+
+  scrollbar-color: #b9b1a7 transparent;
+}
+
+
+/* Chrome / Edge / Safari scrollbar */
+
+#checkoutDialog::-webkit-scrollbar {
+  width: 9px;
+}
+
+#checkoutDialog::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+#checkoutDialog::-webkit-scrollbar-thumb {
+  background: #b9b1a7;
+  border-radius: 999px;
+}
+
+#checkoutDialog::-webkit-scrollbar-thumb:hover {
+  background: #91887d;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+#checkoutDialog .dialog-head {
+  position: sticky !important;
+
+  top: 0 !important;
+
+  z-index: 100 !important;
+
+  background: rgba(255, 255, 255, 0.96) !important;
+
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+
+/* =========================================================
+   INTRO TEXT
+   ========================================================= */
+
+#checkoutDialog > .muted {
+  padding-left: 30px;
+  padding-right: 30px;
+}
+
+
+/* =========================================================
+   CHECKOUT FORM
+   ========================================================= */
+
+#checkoutDialog #checkoutForm {
+  display: block !important;
+
+  width: 100% !important;
+
+  min-height: 0 !important;
+
+  overflow: visible !important;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   SECTIONS
+   ========================================================= */
+
+#checkoutDialog .checkout-section {
+
+  margin: 28px 30px;
+
+  padding: 26px;
+
+  border: 1px solid #e4ded4;
+
+  border-radius: 20px;
+
+  background: #fcfbf8;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   ADDRESS
+   ========================================================= */
+
+#checkoutDialog .checkout-address-example {
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 6px;
+
+  margin: 16px 0 22px;
+
+  padding: 16px 18px;
+
+  border-radius: 14px;
+
+  background: #f3eee5;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   TWO-COLUMN FIELDS
+   ========================================================= */
+
+#checkoutDialog .checkout-field-row {
+
+  display: grid;
+
+  grid-template-columns: 1fr 1fr;
+
+  gap: 16px;
+}
+
+
+/* =========================================================
+   COUPON
+   ========================================================= */
+
+#checkoutDialog .checkout-coupon-row {
+
+  display: grid;
+
+  grid-template-columns: 1fr auto;
+
+  gap: 10px;
+
+  align-items: start;
+}
+
+
+/* =========================================================
+   PAYMENT
+   ========================================================= */
+
+#checkoutDialog .payment-box {
+
+  margin: 28px 30px 20px;
+
+  padding: 18px 20px;
+
+  border-radius: 16px;
+
+  background: #f3eee5;
+
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   PAY BUTTON
+   ========================================================= */
+
+#checkoutDialog #checkoutForm > .button {
+
+  display: block;
+
+  width: calc(100% - 60px);
+
+  margin: 0 30px 30px;
+
+  min-height: 52px;
+
+  box-sizing: border-box;
+}
+
+
+/* =========================================================
+   NOTICE
+   ========================================================= */
+
+#checkoutDialog #checkoutNotice {
+
+  margin-left: 30px;
+
+  margin-right: 30px;
+
+  margin-bottom: 30px;
+}
+
+
+/* =========================================================
+   INPUT FOCUS
+   ========================================================= */
+
+#checkoutDialog input,
+#checkoutDialog textarea,
+#checkoutDialog select {
+
+  box-sizing: border-box;
+
+  max-width: 100%;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  #checkoutDialog {
+
+    top: 6px !important;
+
+    left: 6px !important;
+
+    transform: none !important;
+
+    width: calc(100vw - 12px) !important;
+
+    height: calc(100vh - 12px) !important;
+
+    max-height: calc(100vh - 12px) !important;
+
+    border-radius: 20px !important;
+  }
+
+
+  #checkoutDialog > .muted {
+
+    padding-left: 18px;
+
+    padding-right: 18px;
+  }
+
+
+  #checkoutDialog .checkout-section {
+
+    margin: 20px 12px;
+
+    padding: 20px 17px;
+
+    border-radius: 17px;
+  }
+
+
+  #checkoutDialog .checkout-field-row {
+
+    grid-template-columns: 1fr;
+
+    gap: 0;
+  }
+
+
+  #checkoutDialog .checkout-coupon-row {
+
+    grid-template-columns: 1fr;
+
+    gap: 10px;
+  }
+
+
+  #checkoutDialog .checkout-coupon-row button {
+
+    width: 100%;
+  }
+
+
+  #checkoutDialog .payment-box {
+
+    margin: 20px 12px;
+
+    padding: 16px;
+  }
+
+
+  #checkoutDialog #checkoutForm > .button {
+
+    width: calc(100% - 24px);
+
+    margin-left: 12px;
+
+    margin-right: 12px;
+
+    margin-bottom: 20px;
+  }
+
+
+  #checkoutDialog #checkoutNotice {
+
+    margin-left: 12px;
+
+    margin-right: 12px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+  #checkoutDialog {
+
+    top: 0 !important;
+
+    left: 0 !important;
+
+    width: 100vw !important;
+
+    height: 100vh !important;
+
+    max-height: 100vh !important;
+
+    border-radius: 0 !important;
+  }
+
+}
+
+
+/* =========================================================
+   ANIMATION
+   ========================================================= */
+
+@keyframes checkoutOpen {
+
+  from {
+    opacity: 0;
+    transform: translateX(-50%) translateY(18px) scale(.985);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0) scale(1);
+  }
+
+}
+
+
+#checkoutDialog[open] {
+  animation: checkoutOpen .22s ease-out;
+}
+
+
+/* =========================================================
+   MOBILE ANIMATION
+   ========================================================= */
+
+@media (max-width: 700px) {
+
+  #checkoutDialog[open] {
+    animation: checkoutMobileOpen .22s ease-out;
+  }
+
+}
+
+
+@keyframes checkoutMobileOpen {
+
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(.99);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+   ========================================================= */
+
+@media (prefers-reduced-motion: reduce) {
+
+  #checkoutDialog[open] {
+    animation: none !important;
+  }
+
+}
+
+/* =========================================================
+   CHECKOUT — SURGICAL ALIGNMENT FIX
+   This overrides the previous checkout styling.
+========================================================= */
+
+/* THE MODAL */
+#checkoutDialog {
+  position: fixed !important;
+
+  top: 50% !important;
+  left: 50% !important;
+  right: auto !important;
+  bottom: auto !important;
+
+  transform: translate(-50%, -50%) !important;
+
+  width: min(900px, calc(100vw - 24px)) !important;
+  max-width: 900px !important;
+
+  max-height: calc(100vh - 24px) !important;
+
+  margin: 0 !important;
+  padding: 0 !important;
+
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+#checkoutDialog > .dialog-head {
+  width: 100% !important;
+
+  margin: 0 !important;
+  padding: 24px 30px !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   INTRO TEXT
+========================================================= */
+
+#checkoutDialog > p.muted {
+  width: calc(100% - 60px) !important;
+
+  margin: 22px 30px 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   THE ACTUAL CHECKOUT FORM
+   THIS IS THE IMPORTANT PART.
+========================================================= */
+
+#checkoutDialog #checkoutForm {
+  display: block !important;
+
+  width: calc(100% - 60px) !important;
+  max-width: none !important;
+
+  margin: 24px 30px 40px !important;
+  padding: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* Every section uses the EXACT same width */
+#checkoutDialog #checkoutForm > .checkout-section {
+  width: 100% !important;
+
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   INPUTS
+========================================================= */
+
+#checkoutDialog #checkoutForm input,
+#checkoutDialog #checkoutForm textarea,
+#checkoutDialog #checkoutForm select {
+  width: 100% !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   ADDRESS ROW
+========================================================= */
+
+#checkoutDialog #checkoutForm .checkout-field-row {
+  width: 100% !important;
+
+  margin: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   COUPON
+========================================================= */
+
+#checkoutDialog #checkoutForm .checkout-coupon-row {
+  width: 100% !important;
+
+  margin: 0 !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   PAYMENT
+========================================================= */
+
+#checkoutDialog #checkoutForm .payment-box {
+  width: 100% !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   PAY BUTTON
+========================================================= */
+
+#checkoutDialog #checkoutForm > button[type="submit"] {
+  width: 100% !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   NOTICE
+========================================================= */
+
+#checkoutDialog > #checkoutNotice {
+  width: calc(100% - 60px) !important;
+
+  margin: -20px 30px 30px !important;
+
+  box-sizing: border-box !important;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media (max-width: 700px) {
+
+  #checkoutDialog {
+    width: calc(100vw - 16px) !important;
+    max-width: none !important;
+
+    max-height: calc(100vh - 16px) !important;
+
+    border-radius: 20px !important;
+  }
+
+
+  #checkoutDialog > .dialog-head {
+    padding: 18px 20px !important;
+  }
+
+
+  #checkoutDialog > p.muted {
+    width: calc(100% - 32px) !important;
+
+    margin: 17px 16px 0 !important;
+  }
+
+
+  #checkoutDialog #checkoutForm {
+    width: calc(100% - 32px) !important;
+
+    margin: 20px 16px 28px !important;
+  }
+
+
+  #checkoutDialog > #checkoutNotice {
+    width: calc(100% - 32px) !important;
+
+    margin-left: 16px !important;
+    margin-right: 16px !important;
+  }
+}
+
+
+/* =========================================================
+   SMALL PHONES
+========================================================= */
+
+@media (max-width: 400px) {
+
+  #checkoutDialog {
+    width: calc(100vw - 10px) !important;
+    max-height: calc(100vh - 10px) !important;
+  }
+
+  #checkoutDialog #checkoutForm {
+    width: calc(100% - 24px) !important;
+
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+  }
+
+  #checkoutDialog > p.muted {
+    width: calc(100% - 24px) !important;
+
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+  }
+
+  #checkoutDialog > #checkoutNotice {
+    width: calc(100% - 24px) !important;
+
+    margin-left: 12px !important;
+    margin-right: 12px !important;
+  }
+}
