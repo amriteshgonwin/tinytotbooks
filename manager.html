@@ -755,9 +755,7 @@
                   Percentage
                 </option>
 
-                <option value="fixed">
-                  Fixed amount
-                </option>
+            
 
               </select>
 
@@ -1054,6 +1052,7 @@ const couponFormStatus =
 let books = [];
 let selectedBook = null;
 let currentImages = [];
+let managerOrders = [];
 
 let coupons = [];
 let editingCouponId = null;
@@ -1365,6 +1364,95 @@ booksTabButton.addEventListener(
   'click',
   () => activateTab('books')
 );
+
+function openWhatsAppForOrder(orderId) {
+
+  const order = managerOrders.find(
+    order => String(order.id) === String(orderId)
+  );
+
+  if (!order) {
+    alert('Could not find this order.');
+    return;
+  }
+
+  const phone = String(order.customer_phone || '')
+    .replace(/\D/g, '');
+
+  if (!phone) {
+    alert('This order does not have a customer phone number.');
+    return;
+  }
+
+  const whatsappPhone =
+    phone.length === 10
+      ? `91${phone}`
+      : phone;
+
+  const items =
+    Array.isArray(order.items)
+      ? order.items
+      : [];
+
+  const itemLines = items.length
+    ? items.map(item => {
+
+        const quantity =
+          Number(item.quantity ?? item.qty ?? 1);
+
+        const lineTotal =
+          Number(
+            item.line_total ??
+            ((item.unit_price || 0) * quantity)
+          );
+
+        return `${item.title || 'Book'} × ${quantity} — ₹${lineTotal.toFixed(2)}`;
+
+      }).join('\n')
+    : 'No item details available.';
+
+
+  const customerName =
+    String(order.customer_name || '')
+      .trim();
+
+  const greetingName =
+    customerName || 'there';
+
+
+  const couponLine =
+    order.coupon_code
+      ? `\nCoupon used: ${order.coupon_code}\nDiscount: ₹${Number(order.discount || 0).toFixed(2)}`
+      : '';
+
+
+  const message =
+`Hi ${greetingName}, I am Ayachi from TinyTotBooks!
+
+We have received your order and will be shipping it through India Post very soon. We will keep you updated about your shipment.
+
+Your order details:
+
+Order number: ${order.order_number || `#${order.id}`}
+
+${itemLines}
+
+Subtotal: ₹${Number(order.subtotal || 0).toFixed(2)}
+Shipping: ₹${Number(order.shipping || 0).toFixed(2)}${couponLine}
+Total paid: ₹${Number(order.total || 0).toFixed(2)}
+
+Thank you for ordering from TinyTotBooks!
+We hope the little reader enjoys the story.`;
+
+  const whatsappUrl =
+    `https://wa.me/${whatsappPhone}?text=${encodeURIComponent(message)}`;
+
+  window.open(
+    whatsappUrl,
+    '_blank',
+    'noopener,noreferrer'
+  );
+}
 
 ordersTabButton.addEventListener(
   'click',
@@ -2600,6 +2688,7 @@ async function loadOrders() {
     return;
   }
 
+managerOrders = orders || [];
 
   if (
     !orders ||
@@ -2816,6 +2905,16 @@ async function loadOrders() {
 
               </div>
 
+<div style="margin-top:18px;">
+  <button
+    class="primary"
+    type="button"
+    onclick="openWhatsAppForOrder(${order.id})"
+  >
+    WhatsApp customer
+  </button>
+</div>
+              
             </article>
 
           `;

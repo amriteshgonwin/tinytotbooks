@@ -155,6 +155,8 @@ const state={
 
 };
 
+
+
 async function renderShipping(){
 
   app.innerHTML = `
@@ -321,6 +323,31 @@ async function loadBookImagesFromSupabase() {
   }
 
   // route later
+}
+
+async function loadSiteContentFromSupabase() {
+  const { data, error } = await supabase
+    .from('siteSettings')
+    .select('*')
+    .eq('id', 'general')
+    .maybeSingle();
+
+  if (error) {
+    console.error('Could not load site settings:', error);
+    return;
+  }
+
+  if (!data) {
+    console.warn('No siteSettings/general row found.');
+    return;
+  }
+
+  state.content = {
+    ...state.content,
+    ...data
+  };
+
+  console.log('SITE CONTENT LOADED:', state.content);
 }
 
 async function loadReviewsFromSupabase(){
