@@ -6027,3 +6027,616 @@ footer h4{
     margin-right: 12px !important;
   }
 }
+
+/* =========================================================
+   TINYTOTBOOKS — OFFERS PAGE FINAL POLISH
+   Paste at the VERY BOTTOM of styles.css
+   ========================================================= */
+
+
+/* ---------------------------------------------------------
+   WHOLE OFFERS PAGE
+   --------------------------------------------------------- */
+
+.offers-page {
+  width: min(100% - 32px, 1100px);
+  margin: 0 auto;
+  padding-top: 70px;
+  padding-bottom: 100px;
+}
+
+
+/* ---------------------------------------------------------
+   MAIN PAGE INTRO
+   Offers & Coupons
+   Little treats...
+   Discover...
+   --------------------------------------------------------- */
+
+.offers-page > .page-head {
+  width: min(100%, 850px);
+  margin: 0 auto 55px;
+
+  text-align: center;
+}
+
+
+/* small eyebrow */
+
+.offers-page > .page-head .eyebrow {
+  display: block;
+
+  margin: 0 0 14px;
+
+  text-align: center;
+
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+}
+
+
+/* main heading */
+
+.offers-page > .page-head h1 {
+  max-width: 800px;
+
+  margin: 0 auto 18px;
+
+  text-align: center;
+
+  font-size: clamp(2.7rem, 5vw, 4.3rem);
+  line-height: 1.02;
+  letter-spacing: -0.045em;
+}
+
+
+/* intro paragraph */
+
+.offers-page > .page-head p {
+  max-width: 650px;
+
+  margin: 0 auto;
+
+  text-align: center;
+
+  font-size: 1.05rem;
+  line-height: 1.65;
+
+  color: #687277;
+}
+
+
+/* ---------------------------------------------------------
+   INFORMATION CARDS
+   Current offers + Coupon rules
+   --------------------------------------------------------- */
+
+.offers-page > .offers-info-card {
+  width: min(100%, 880px);
+
+  margin-left: auto;
+  margin-right: auto;
+
+  padding: 28px 36px;
+
+  text-align: center;
+
+  background: #f7f3eb;
+
+  border: 1px solid #e5ddd0;
+  border-radius: 24px;
+
+  box-shadow: none;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+.offers-page > .offers-info-card:hover {
+  transform: translateY(-2px);
+
+  box-shadow:
+    0 12px 30px rgba(36, 52, 61, 0.06);
+}
+
+
+/* Current offers card */
+
+.offers-page > .offers-info-card:first-of-type {
+  margin-bottom: 72px;
+}
+
+
+/* Coupon rules card */
+
+.offers-page > .offers-info-card:last-of-type {
+  margin-top: 78px;
+}
+
+
+/* info card eyebrow */
+
+.offers-page > .offers-info-card .eyebrow {
+  display: block;
+
+  margin: 0 0 11px;
+
+  text-align: center;
+
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+}
+
+
+/* info card text */
+
+.offers-page > .offers-info-card p {
+  max-width: 760px;
+
+  margin: 0 auto;
+
+  text-align: center;
+
+  line-height: 1.65;
+  color: #52636b;
+}
+
+
+/* ---------------------------------------------------------
+   COUPON SECTION
+   --------------------------------------------------------- */
+
+.offers-coupons-section {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin: 0 auto;
+}
+
+
+/* ---------------------------------------------------------
+   COUPON SECTION HEADING
+   --------------------------------------------------------- */
+
+.offers-coupons-section .section-head {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  margin: 0 0 40px;
+
+  text-align: center;
+}
+
+
+/* CURRENT COUPONS */
+
+.offers-coupons-section .section-head .eyebrow {
+  display: block;
+
+  margin: 0 0 13px;
+
+  text-align: center;
+
+  font-size: 0.76rem;
+  letter-spacing: 0.14em;
+}
+
+
+/* SAVE A LITTLE EXTRA */
+
+.offers-coupons-section .section-head h2 {
+  width: 100%;
+  max-width: 800px;
+
+  margin: 0 auto;
+
+  text-align: center;
+
+  font-size: clamp(2.6rem, 5vw, 4.25rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+
+  color: #24343d;
+}
+
+
+/* ---------------------------------------------------------
+   COUPON GRID
+   --------------------------------------------------------- */
+
+#offersCouponList {
+  width: min(100%, 900px);
+
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+
+  gap: 24px;
+
+  margin: 0 auto;
+}
+
+
+/* ---------------------------------------------------------
+   COUPON CARD
+   --------------------------------------------------------- */
+
+#offersCouponList .coupon-card {
+  position: relative;
+
+  min-height: 315px;
+
+  padding: 30px 30px 27px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+
+  border: 1px solid #e1e3e1;
+  border-top: 4px solid #24343d;
+
+  border-radius: 22px;
+
+  box-shadow:
+    0 12px 32px rgba(36, 52, 61, 0.07);
+
+  animation: offersCouponAppear 500ms ease both;
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
+}
+
+
+#offersCouponList .coupon-card:hover {
+  transform: translateY(-5px);
+
+  box-shadow:
+    0 18px 42px rgba(36, 52, 61, 0.11);
+}
+
+
+/* stagger animation */
+
+#offersCouponList .coupon-card:nth-child(2) {
+  animation-delay: 80ms;
+}
+
+#offersCouponList .coupon-card:nth-child(3) {
+  animation-delay: 160ms;
+}
+
+#offersCouponList .coupon-card:nth-child(4) {
+  animation-delay: 240ms;
+}
+
+
+/* ---------------------------------------------------------
+   CARD TOP
+   --------------------------------------------------------- */
+
+#offersCouponList .coupon-card-top {
+  display: flex;
+
+  align-items: center;
+  justify-content: space-between;
+
+  gap: 15px;
+
+  margin-bottom: 27px;
+}
+
+
+/* coupon eyebrow */
+
+#offersCouponList .coupon-card-top .eyebrow {
+  margin: 0;
+
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+}
+
+
+/* discount pill */
+
+#offersCouponList .coupon-discount {
+  display: inline-flex;
+
+  align-items: center;
+  justify-content: center;
+
+  padding: 8px 14px;
+
+  background: #f5ead6;
+
+  border-radius: 999px;
+
+  color: #24343d;
+
+  font-size: 0.78rem;
+  font-weight: 800;
+
+  white-space: nowrap;
+}
+
+
+/* ---------------------------------------------------------
+   CARD TITLE
+   --------------------------------------------------------- */
+
+#offersCouponList .coupon-card h3 {
+  margin: 0 0 10px;
+
+  color: #24343d;
+
+  font-size: 1.45rem;
+  line-height: 1.2;
+}
+
+
+/* description */
+
+#offersCouponList .coupon-card > p {
+  margin: 0 0 22px;
+
+  color: #687277;
+
+  line-height: 1.55;
+}
+
+
+/* ---------------------------------------------------------
+   COUPON CODE
+   CLEAN — NO STRIPES
+   --------------------------------------------------------- */
+
+#offersCouponList .coupon-code {
+  width: 100%;
+
+  margin-top: auto;
+  margin-bottom: 17px;
+
+  padding: 17px 16px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  text-align: center;
+
+  background: #f7f3eb;
+
+  border: 1px solid #ded6c8;
+  border-radius: 13px;
+
+  color: #24343d;
+
+  font-family:
+    "Courier New",
+    Courier,
+    monospace;
+
+  font-size: 1.08rem;
+  font-weight: 800;
+
+  letter-spacing: 0.17em;
+
+  overflow-wrap: anywhere;
+
+  transition:
+    background 180ms ease,
+    border-color 180ms ease;
+}
+
+
+#offersCouponList .coupon-card:hover .coupon-code {
+  background: #f3ecdf;
+
+  border-color: #cfc4b4;
+}
+
+
+/* minimum order */
+
+#offersCouponList .coupon-card small {
+  display: block;
+
+  margin: 0;
+
+  color: #687277;
+
+  font-size: 0.84rem;
+}
+
+
+/* ---------------------------------------------------------
+   RULES CARD
+   EXTRA BREATHING ROOM
+   --------------------------------------------------------- */
+
+.offers-page > .offers-coupons-section
++ .offers-info-card {
+  margin-top: 82px;
+}
+
+
+/* ---------------------------------------------------------
+   ANIMATION
+   --------------------------------------------------------- */
+
+@keyframes offersCouponAppear {
+
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   MOBILE
+   --------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+  .offers-page {
+    width: min(100% - 24px, 600px);
+
+    padding-top: 45px;
+    padding-bottom: 65px;
+  }
+
+
+  /* main intro */
+
+  .offers-page > .page-head {
+    margin-bottom: 42px;
+  }
+
+
+  .offers-page > .page-head h1 {
+    font-size: clamp(2.35rem, 10vw, 3.4rem);
+
+    line-height: 1.03;
+  }
+
+
+  .offers-page > .page-head p {
+    font-size: 0.98rem;
+  }
+
+
+  /* current offers */
+
+  .offers-page > .offers-info-card {
+    padding: 25px 20px;
+
+    border-radius: 20px;
+  }
+
+
+  .offers-page > .offers-info-card:first-of-type {
+    margin-bottom: 58px;
+  }
+
+
+  /* coupon heading */
+
+  .offers-coupons-section .section-head {
+    margin-bottom: 30px;
+  }
+
+
+  .offers-coupons-section .section-head h2 {
+    font-size: clamp(2.35rem, 10vw, 3.3rem);
+
+    line-height: 1.02;
+  }
+
+
+  /* cards */
+
+  #offersCouponList {
+    width: 100%;
+
+    grid-template-columns: 1fr;
+
+    gap: 18px;
+  }
+
+
+  #offersCouponList .coupon-card {
+    min-height: 0;
+
+    padding: 26px 22px 24px;
+
+    border-radius: 20px;
+  }
+
+
+  /* rules */
+
+  .offers-page > .offers-info-card:last-of-type {
+    margin-top: 62px;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   SMALL PHONES
+   --------------------------------------------------------- */
+
+@media (max-width: 420px) {
+
+  .offers-page {
+    width: min(100% - 20px, 600px);
+  }
+
+
+  .offers-page > .page-head h1 {
+    font-size: 2.45rem;
+  }
+
+
+  .offers-page > .page-head p {
+    font-size: 0.94rem;
+  }
+
+
+  .offers-page > .offers-info-card {
+    padding: 23px 18px;
+  }
+
+
+  #offersCouponList .coupon-card {
+    padding: 24px 19px 22px;
+  }
+
+
+  #offersCouponList .coupon-card h3 {
+    font-size: 1.3rem;
+  }
+
+
+  #offersCouponList .coupon-code {
+    padding: 15px 12px;
+
+    font-size: 0.98rem;
+    letter-spacing: 0.13em;
+  }
+
+}
+
+
+/* ---------------------------------------------------------
+   REDUCED MOTION
+   --------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+
+  #offersCouponList .coupon-card {
+    animation: none;
+    transition: none;
+  }
+
+  #offersCouponList .coupon-card:hover {
+    transform: none;
+  }
+
+}
+
