@@ -33,7 +33,7 @@ const defaultContent={
   ageTitle:'Find their next favourite.',
   ageText:'Browse by age, interest, or the kind of adventure they’re craving today.',
   offersMessage:'Our current offers are waiting for you!',
-  offersRules:'Coupons can be used once per order. Only one coupon may be applied to an order. Offers cannot be combined with other discounts.'
+offersRules:'• Coupons can be used once per order\n• Only one coupon may be applied to an order\n• Offers cannot be combined with other discounts'
 };
 
 const defaultCharacters=[
@@ -129,7 +129,9 @@ document.addEventListener('click', async e => {
 });
 const state={
 
-  books:seedBooks,
+  books:[] ,
+
+  allBooks: [],
 
   cart:JSON.parse(localStorage.getItem('ss-cart')||'[]'),
 
@@ -148,6 +150,8 @@ const state={
   admin:sessionStorage.getItem('ss-admin')==='yes',
 
   filter:'All',
+
+  sort: 'newest',
 
   editingBook:null,
 
@@ -243,10 +247,13 @@ async function loadBooksFromSupabase() {
     return;
   }
 
-  if (Array.isArray(data) && data.length) {
-    state.books = data;
-    // route later
-  }
+if (Array.isArray(data) && data.length) {
+
+state.allBooks = data;
+state.books = data.filter(book => book.available !== false);
+
+  // route later
+}
 }
 
 
@@ -596,9 +603,71 @@ function renderHome(){
 
 function renderBooks(){
   const genres=['All',...new Set(state.books.map(b=>b.genre))];
-  const books=state.filter==='All'
-    ? state.books
-    : state.books.filter(b=>b.genre===state.filter);
+const filteredBooks = state.filter === 'All'
+  ? state.books
+  : state.books.filter(b => b.genre === state.filter);
+
+const books = [...filteredBooks];
+
+switch(state.sort){
+
+  case 'newest':
+    books.sort(
+      (a,b) =>
+        new Date(b.created_at || 0) -
+        new Date(a.created_at || 0)
+    );
+    break;
+
+  case 'oldest':
+    books.sort(
+      (a,b) =>
+        new Date(a.created_at || 0) -
+        new Date(b.created_at || 0)
+    );
+    break;
+
+  case 'price-high':
+    books.sort(
+      (a,b) =>
+        Number(b.price || 0) -
+        Number(a.price || 0)
+    );
+    break;
+
+  case 'price-low':
+    books.sort(
+      (a,b) =>
+        Number(a.price || 0) -
+        Number(b.price || 0)
+    );
+    break;
+
+  case 'reviews-high':
+    books.sort(
+      (a,b) =>
+        Number(b.reviews || 0) -
+        Number(a.reviews || 0)
+    );
+    break;
+
+  case 'rating-high':
+    books.sort(
+      (a,b) =>
+        Number(b.rating || 0) -
+        Number(a.rating || 0)
+    );
+    break;
+
+  case 'title':
+    books.sort(
+      (a,b) =>
+        String(a.title || '').localeCompare(
+          String(b.title || '')
+        )
+    );
+    break;
+}
 
   app.innerHTML=`
     ${pageHero(
@@ -613,6 +682,43 @@ function renderBooks(){
           <button class="filter ${x===state.filter?'active':''}" onclick="setFilter('${x}')">${x}</button>
         `).join('')}
       </div>
+
+<div class="book-sort">
+  <label for="bookSort">Sort by</label>
+
+  <select
+    id="bookSort"
+    onchange="setBookSort(this.value)"
+  >
+    <option value="newest" ${state.sort === 'newest' ? 'selected' : ''}>
+      Newest first
+    </option>
+
+    <option value="oldest" ${state.sort === 'oldest' ? 'selected' : ''}>
+      Oldest first
+    </option>
+
+    <option value="price-high" ${state.sort === 'price-high' ? 'selected' : ''}>
+      Price: High to Low
+    </option>
+
+    <option value="price-low" ${state.sort === 'price-low' ? 'selected' : ''}>
+      Price: Low to High
+    </option>
+
+    <option value="reviews-high" ${state.sort === 'reviews-high' ? 'selected' : ''}>
+      Most reviews
+    </option>
+
+    <option value="rating-high" ${state.sort === 'rating-high' ? 'selected' : ''}>
+      Highest rated
+    </option>
+
+    <option value="title" ${state.sort === 'title' ? 'selected' : ''}>
+      A–Z
+    </option>
+  </select>
+</div>
 
       <div class="book-grid">
         ${books.map(bookCard).join('')}
@@ -870,6 +976,120 @@ async function renderFAQs() {
   });
 }
 
+function showBundleDetails(bundleId) {
+
+  const bundle = (state.bundles || []).find(
+    b => Number(b.id) === Number(bundleId)
+  );
+
+  if (!bundle) {
+    console.error('Bundle not found:', bundleId);
+    return;
+  }
+
+  const books = Array.isArray(bundle.book_ids)
+    ? bundle.book_ids
+        .map(id =>
+          state.allBooks.find(
+            book => Number(book.id) === Number(id)
+          )
+        )
+        .filter(Boolean)
+    : [];
+
+  const overlay = document.createElement('div');
+
+  overlay.className = 'bundle-details-overlay';
+
+  overlay.innerHTML = `
+    <div class="bundle-details-modal">
+
+      <button
+        class="bundle-details-close"
+        type="button"
+        aria-label="Close"
+        onclick="this.closest('.bundle-details-overlay').remove()"
+      >
+        ×
+      </button>
+
+      <div class="bundle-details-head">
+
+        <span class="eyebrow">
+          Inside this bundle
+        </span>
+
+        <h2>
+          ${esc(bundle.title || '')}
+        </h2>
+
+        <p>
+          ${esc(bundle.description || '')}
+        </p>
+
+      </div>
+
+      <div class="bundle-details-books">
+
+        ${
+          books.length
+            ? books.map(book => `
+                <button
+                  type="button"
+                  class="bundle-detail-book"
+                  onclick="openBookFromBundle(${book.id})"
+                >
+
+                  ${
+                    book.image_url
+                      ? `
+                        <img
+                          src="${esc(book.image_url)}"
+                          alt="${esc(book.title || '')}"
+                        >
+                      `
+                      : `
+                        <div class="bundle-detail-book-placeholder">
+                          ${esc(book.icon || '📚')}
+                        </div>
+                      `
+                  }
+
+                  <div class="bundle-detail-book-info">
+
+                    <h3>
+                      ${esc(book.title || '')}
+                    </h3>
+
+                    <span>
+                      View book
+                    </span>
+
+                  </div>
+
+                </button>
+              `).join('')
+            : `
+                <p class="muted">
+                  No books have been added to this bundle yet.
+                </p>
+            `
+        }
+
+      </div>
+
+    </div>
+  `;
+
+  document.body.appendChild(overlay);
+
+  overlay.addEventListener('click', event => {
+    if (event.target === overlay) {
+      overlay.remove();
+    }
+  });
+}
+
 function renderBundles(){
 
   const bundles = state.bundles || [];
@@ -908,7 +1128,7 @@ function renderBundles(){
                         <ul>
                           ${
                             b.book_ids.map(id => {
-                              const book = state.books.find(
+                              const book = state.allBooks.find(
                                 x => Number(x.id) === Number(id)
                               );
 
@@ -922,20 +1142,32 @@ function renderBundles(){
                       : ''
                   }
 
-                  <div class="bundle-footer">
 
-                    <strong>
-                      ${money(b.price || 0)}
-                    </strong>
+<div class="bundle-footer">
 
-                    <button
-                      class="button button-dark"
-                    onclick="addBundle(${b.id})"
-                      >
-                      ${esc(b.button_text || 'Add bundle')}
-                    </button>
+  <strong>
+    ${money(b.price || 0)}
+  </strong>
 
-                  </div>
+  <div class="bundle-actions">
+
+    <button
+      class="button button-light"
+      onclick="showBundleDetails(${b.id})"
+    >
+      View books
+    </button>
+
+    <button
+      class="button button-dark"
+      onclick="addBundle(${b.id})"
+    >
+      ${esc(b.button_text || 'Add bundle')}
+    </button>
+
+  </div>
+
+</div>
 
                 </article>
               `).join('')
@@ -2068,7 +2300,7 @@ function renderOffers(){
       <div class="offers-info-card">
 
         <span class="eyebrow">
-          Current offers
+          Hello fellers
         </span>
 
         <p id="offersMessage">
@@ -2781,6 +3013,80 @@ onclick="event.stopPropagation(); bookDialog.close(); location.hash='#book/${b.i
   d.showModal();
 }
 
+function openBookFromBundle(id) {
+  const b = state.allBooks.find(
+    x => Number(x.id) === Number(id)
+  );
+
+  if (!b) {
+    console.error('Bundle book not found:', id);
+    return;
+  }
+
+  const d = document.querySelector('#bookDialog');
+
+  d.innerHTML = `
+    <div class="dialog-head">
+      <span class="tag">${esc(b.genre || '')} · Ages ${esc(b.age || '')}</span>
+      <button class="close" onclick="bookDialog.close()">×</button>
+    </div>
+
+    <div class="book-detail">
+
+
+<div
+  class="book-detail-cover-link"
+  style="cursor:pointer"
+  title="View full book details"
+  onclick="openFullBookFromBundle(event, ${b.id})"
+>
+  ${cover(b)}
+</div>
+
+      <div>
+        <h1>${esc(b.title || '')}</h1>
+
+        <p class="muted">
+          by ${esc(b.author || '')} ·
+          <span class="rating">
+            ★ ${b.rating || 0} from ${b.reviews || 0} readers
+          </span>
+        </p>
+
+        <p>${esc(b.description || '')}</p>
+
+        <p>
+          <strong>${money(b.price || 0)}</strong>
+        </p>
+
+        <span class="status sold">
+          Available only as part of a bundle
+        </span>
+      </div>
+
+    </div>
+  `;
+
+  d.showModal();
+}
+
+function openFullBookFromBundle(event, bookId) {
+  event.preventDefault();
+  event.stopPropagation();
+
+  const overlay = document.querySelector('.bundle-details-overlay');
+
+  if (overlay) {
+    overlay.remove();
+  }
+
+  if (typeof bookDialog !== 'undefined' && bookDialog.open) {
+    bookDialog.close();
+  }
+
+  location.hash = `#book/${bookId}`;
+}
+
 /* =========================================================
    ORDER CONFIRMATION
 ========================================================= */
@@ -3362,7 +3668,7 @@ function copyOrderNumber() {
 
 function renderBookDetail(id){
 
-  const b = state.books.find(
+  const b = state.allBooks.find(
     x => Number(x.id) === Number(id)
   );
 
@@ -3500,7 +3806,8 @@ function renderBookDetail(id){
                 `
                 : `
                   <span class="status sold">
-                    Currently sold out
+  Available only as part of a bundle
+
                   </span>
                 `
             }
@@ -3567,6 +3874,11 @@ function changeBookDetailImage(index){
 
 function setFilter(f){
   state.filter=f;
+  renderBooks();
+}
+
+function setBookSort(value){
+  state.sort = value;
   renderBooks();
 }
 
@@ -4187,11 +4499,40 @@ items: state.cart.map(item => ({
            *
            * Only NOW do we consider the order successful.
            */
+
+// Mark every ordered book as unavailable.
+// This happens ONLY after Razorpay payment has been
+// successfully verified by the Supabase server.
+
+const orderedBookIds = [
+  ...new Set(
+    state.cart
+      .filter(item => (item.type || 'book') === 'book')
+      .map(item => item.id)
+  )
+];
+
+for (const bookId of orderedBookIds) {
+  const { error: availabilityError } = await supabase
+    .from('books')
+    .update({ available: false })
+    .eq('id', bookId);
+
+  if (availabilityError) {
+    console.error(
+      `Could not update availability for book ${bookId}:`,
+      availabilityError
+    );
+  }
+}
+
 renderOrderConfirmation(
   verifyData.order?.order_number ||
   verifyData.order_number ||
   data.order_number
 );
+
+
           /*
            * Clear the cart only after successful
            * server-side payment verification.
