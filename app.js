@@ -2980,6 +2980,7 @@ function closeCart(){
   }, 100);
 
 }
+
 function openBook(id){
   const b=state.books.find(x=>x.id===id);
   const d=document.querySelector('#bookDialog');
@@ -2991,90 +2992,105 @@ function openBook(id){
     </div>
 
     <div class="book-detail">
-     <div
-  class="book-detail-cover-link"
-onclick="event.stopPropagation(); bookDialog.close(); location.hash='#book/${b.id}'"
-  style="cursor:pointer"
-  title="View full book details"
->
-  ${cover(b)}
-</div>
+
+      <div>
+        <div
+          class="book-detail-cover-link"
+          onclick="event.stopPropagation(); bookDialog.close(); location.hash='#book/${b.id}'"
+          style="cursor:pointer"
+          title="View full book details"
+        >
+          ${cover(b)}
+        </div>
+
+        <p style="text-align:center; margin:8px 0 0; font-size:0.82rem; opacity:0.65;">
+          Click the picture for the detailed book page
+        </p>
+      </div>
 
       <div>
         <h1>${esc(b.title)}</h1>
+
         <p class="muted">
           by ${esc(b.author)} ·
           <span class="rating">★ ${b.rating} from ${b.reviews} readers</span>
         </p>
 
         <p>${esc(b.description)}</p>
+
         <p><strong>${money(b.price)}</strong></p>
 
         ${b.available
           ? `<button class="button button-dark" onclick="addToCart(${b.id});bookDialog.close()">Add to bag</button>`
           : '<span class="status sold">Currently sold out</span>'}
       </div>
+
     </div>
   `;
 
   d.showModal();
 }
 
-function openBookFromBundle(id) {
-  const b = state.allBooks.find(
-    x => Number(x.id) === Number(id)
-  );
-
-  if (!b) {
-    console.error('Bundle book not found:', id);
-    return;
-  }
-
-  const d = document.querySelector('#bookDialog');
-
-  d.innerHTML = `
-    <div class="dialog-head">
-      <span class="tag">${esc(b.genre || '')} · Ages ${esc(b.age || '')}</span>
-      <button class="close" onclick="bookDialog.close()">×</button>
-    </div>
-
-    <div class="book-detail">
-
-
-<div
-  class="book-detail-cover-link"
-  style="cursor:pointer"
-  title="View full book details"
-  onclick="openFullBookFromBundle(event, ${b.id})"
->
-  ${cover(b)}
-</div>
-
+function openBookFromBundle(id) { 
+  const b = state.allBooks.find( 
+    x => Number(x.id) === Number(id) 
+  ); 
+ 
+  if (!b) { 
+    console.error('Bundle book not found:', id); 
+    return; 
+  } 
+ 
+  const d = document.querySelector('#bookDialog'); 
+ 
+  d.innerHTML = ` 
+    <div class="dialog-head"> 
+      <span class="tag">${esc(b.genre || '')} · Ages ${esc(b.age || '')}</span> 
+      <button class="close" onclick="bookDialog.close()">×</button> 
+    </div> 
+ 
+    <div class="book-detail"> 
+ 
       <div>
-        <h1>${esc(b.title || '')}</h1>
-
-        <p class="muted">
-          by ${esc(b.author || '')} ·
-          <span class="rating">
-            ★ ${b.rating || 0} from ${b.reviews || 0} readers
-          </span>
-        </p>
-
-        <p>${esc(b.description || '')}</p>
-
-        <p>
-          <strong>${money(b.price || 0)}</strong>
-        </p>
-
-        <span class="status sold">
-          Available only as part of a bundle
-        </span>
+        <div 
+          class="book-detail-cover-link" 
+          style="cursor:pointer" 
+          title="View full book details" 
+          onclick="openFullBookFromBundle(event, ${b.id})" 
+        > 
+          ${cover(b)} 
+        </div> 
+ 
+        <p style="text-align:center; margin:8px 0 0; font-size:0.82rem; opacity:0.65;"> 
+          Click the picture for the detailed book page 
+        </p> 
       </div>
-
-    </div>
-  `;
-
-  d.showModal();
+ 
+      <div> 
+        <h1>${esc(b.title || '')}</h1> 
+ 
+        <p class="muted"> 
+          by ${esc(b.author || '')} · 
+          <span class="rating"> 
+            ★ ${b.rating || 0} from ${b.reviews || 0} readers 
+          </span> 
+        </p> 
+ 
+        <p>${esc(b.description || '')}</p> 
+ 
+        <p> 
+          <strong>${money(b.price || 0)}</strong> 
+        </p> 
+ 
+        <span class="status sold"> 
+          Available only as part of a bundle 
+        </span> 
+      </div> 
+ 
+    </div> 
+  `; 
+ 
+  d.showModal(); 
 }
 
 function openFullBookFromBundle(event, bookId) {
@@ -4695,11 +4711,45 @@ async function initializeApp() {
 
   await loadReviewsFromSupabase();
 
+  sanitizeCart();
 
   updateAnnouncement();
 
   route();
 
+}
+
+function sanitizeCart() {
+  state.cart = state.cart.filter(item => {
+    const type = item.type || 'book';
+
+    // Standalone books must still be available.
+    if (type === 'book') {
+      return state.books.some(
+        book => Number(book.id) === Number(item.id)
+      );
+    }
+
+    // Bundles are valid based on the bundle itself,
+    // NOT on whether their individual books are available.
+    if (type === 'bundle') {
+      return state.bundles.some(
+        bundle => Number(bundle.id) === Number(item.id)
+      );
+    }
+
+    // Monthly picks are valid based on the monthly pick itself.
+    if (type === 'monthly') {
+      return state.monthlyPicks.some(
+        pick => Number(pick.id) === Number(item.id)
+      );
+    }
+
+    // Remove anything with an unknown cart type.
+    return false;
+  });
+
+  save();
 }
 
 initializeApp();
