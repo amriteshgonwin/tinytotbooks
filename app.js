@@ -575,22 +575,22 @@ function renderHome(){
        <article class="feature character-feature">
 
   <span class="eyebrow">
-    Meet the characters
+    Explore the formats
   </span>
 
   <h2>
-    Every story needs a great friend.
+    Every story needs a great binding.
   </h2>
 
   <p>
-    From curious animals to magical mischief-makers, find the characters they’ll love meeting next.
+Playful pop-ups, beautiful hardcovers, and easy-to-love paperbacks, find the format that fits their next reading adventure.
   </p>
 
   <a
     class="button button-dark"
     href="#characters"
   >
-    Meet the characters →
+    Browse by format →
   </a>
 
   <span class="doodle">
