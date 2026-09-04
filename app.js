@@ -325,7 +325,7 @@ async function loadBookImagesFromSupabase() {
   // Attach images to the correct book
   console.log('BOOK IMAGES LOADED:', data);
 
-  for (const book of state.books) {
+  for (const book of state.allBooks) {
     book.images = (data || [])
 .filter(image => Number(image.book_id) === Number(book.id))
     .sort((a, b) => a.sort_order - b.sort_order);
@@ -1053,20 +1053,7 @@ function showBundleDetails(bundleId) {
                   onclick="openBookFromBundle(${book.id})"
                 >
 
-                  ${
-                    book.image_url
-                      ? `
-                        <img
-                          src="${esc(book.image_url)}"
-                          alt="${esc(book.title || '')}"
-                        >
-                      `
-                      : `
-                        <div class="bundle-detail-book-placeholder">
-                          ${esc(book.icon || '📚')}
-                        </div>
-                      `
-                  }
+                   ${cover(book)}
 
                   <div class="bundle-detail-book-info">
 
@@ -1123,9 +1110,16 @@ function renderBundles(){
             ? bundles.map(b => `
                 <article class="bundle">
 
-                  <div class="bundle-art">
-                    ${esc(b.icon || '🎁')}
-                  </div>
+<div class="bundle-art">
+  ${
+    b.image_url
+      ? `<img
+          src="${esc(b.image_url)}"
+          alt="${esc(b.title || 'Bundle')}"
+        >`
+      : esc(b.icon || '🎁')
+  }
+</div>
 
                   <h2>
                     ${esc(b.title || '')}
@@ -3850,10 +3844,10 @@ function changeBookDetailImage(index){
   const id =
     Number(location.hash.split('/')[1]);
 
-  const b =
-    state.books.find(
-      x => Number(x.id) === id
-    );
+const b =
+  state.allBooks.find(
+    x => Number(x.id) === id
+  );
 
   if(!b || !b.images || !b.images[index]) return;
 
