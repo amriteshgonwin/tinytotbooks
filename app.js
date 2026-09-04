@@ -151,6 +151,8 @@ const state={
 
   filter:'All',
 
+  ageFilter: null,
+
   sort: 'newest',
 
   editingBook:null,
@@ -603,9 +605,20 @@ function renderHome(){
 
 function renderBooks(){
   const genres=['All',...new Set(state.books.map(b=>b.genre))];
-const filteredBooks = state.filter === 'All'
-  ? state.books
-  : state.books.filter(b => b.genre === state.filter);
+
+let filteredBooks = state.books;
+
+if (state.ageFilter) {
+  filteredBooks = filteredBooks.filter(
+    b => b.age.replace('-', '–') === state.ageFilter
+  );
+}
+
+if (state.filter !== 'All') {
+  filteredBooks = filteredBooks.filter(
+    b => b.genre === state.filter
+  );
+}
 
 const books = [...filteredBooks];
 
@@ -769,8 +782,8 @@ function renderAges(){
     <section class="section">
       <div class="age-grid">
         ${ages.map((a,i)=>`
-          <a class="age-card" href="#books" onclick="filterAge('${i===0?'2–4':i===1?'3–5':i===2?'6–8':'7–9'}')">
-            <span>${a[2]}</span>
+           <a class="age-card" href="#books" onclick="filterAge('${i===0?'0–2':i===1?'3–5':i===2?'6–8':'9+'}')">
+          <span>${a[2]}</span>
             <h2>Ages ${a[0]}</h2>
             <p>${a[1]}</p>
             <b>Explore →</b>
@@ -3887,16 +3900,9 @@ function filterFromLink(f){
 }
 
 function filterAge(a){
-  state.filter='All';
-
-  setTimeout(()=>{
-    renderBooks();
-
-    document.querySelector('.filters').insertAdjacentHTML(
-      'afterend',
-      `<p class="muted">Showing all books — look for Ages ${a} in each description.</p>`
-    );
-  },10);
+  state.ageFilter = a;
+  state.filter = 'All';
+  renderBooks();
 }
 
 function toggleSold(id){
