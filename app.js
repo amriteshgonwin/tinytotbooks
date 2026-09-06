@@ -4177,6 +4177,9 @@ document.querySelector('#checkoutButton').onclick=()=>{
   checkoutDialog.showModal();
 };
 
+let activeOrderId = null;
+let activeRazorpayOrderId = null;
+
 document.querySelector('#checkoutForm').onsubmit = async e => {
   e.preventDefault();
 
@@ -4406,7 +4409,10 @@ customer: {
 
     checkoutNotice.textContent = '';
 
-    const options = {
+     activeOrderId = data.order_id;
+     activeRazorpayOrderId = data.razorpay_order_id;
+
+     const options = {
 
       key: data.key_id,
 
@@ -4606,12 +4612,44 @@ if (
       },
 
       modal: {
-        ondismiss: function() {
+  ondismiss: async function() {
+    checkoutNotice.textContent =
+      'Payment window closed. Releasing your reservation...';
 
-          checkoutNotice.textContent =
-            'Payment window closed. Your order has not been placed.';
-        }
+    try {
+      if (activeOrderId) {
+        await fetch(
+          'https://xzwkombhtesozqobldvu.supabase.co/functions/v1/release-inventory',
+          {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              order_id: activeOrderId,
+              razorpay_order_id: activeRazorpayOrderId
+            })
+          }
+        );
       }
+
+      checkoutNotice.textContent =
+        'Payment window closed. Your books have been released.';
+    } catch (error) {
+      console.error(
+        'Could not release inventory after checkout was closed:',
+        error
+      );
+
+      checkoutNotice.textContent =
+        'Payment window closed. Your reservation will expire automatically.';
+    }
+
+    activeOrderId = null;
+    activeRazorpayOrderId = null;
+  }
+}
+
     };
 
     const razorpay =
