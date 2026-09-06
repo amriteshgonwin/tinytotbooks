@@ -742,12 +742,11 @@ switch(state.sort){
 
 function renderCharacters(){
   app.innerHTML=`
-    ${pageHero(
-      'Browse by mood',
-      'Who will they meet next?',
-      'Pick a shelf full of characters they already love — and a few new friends waiting to be found.'
-    )}
-
+${pageHero(
+  'Browse by format',
+  'Find the right format for little hands.',
+  'Explore different ways to enjoy a story — from classic hardcovers and paperbacks to sturdy board books, pop-ups and interactive reads.'
+)}
     <section class="section">
       <div class="collection-grid">
         ${state.characters.map(x=>`
@@ -1981,261 +1980,6 @@ function sendBulkWhatsApp(){
   window.open(url,'_blank','noopener');
 }
 
-function renderAdmin(){
-  if(!state.admin){
-    app.innerHTML=`
-      ${pageHero(
-        'Shop dashboard',
-        'Admin sign in',
-        'Manage your book shelf, stock status and website content from one simple place.'
-      )}
-
-      <section class="section">
-        <form class="admin-login" onsubmit="adminLogin(event)">
-          <h2>Welcome back</h2>
-          <p class="muted">Demo passcode: <b>storybook</b></p>
-          <label>Passcode<input id="adminPass" type="password" required placeholder="Enter passcode" /></label>
-          <br>
-          <button class="button button-dark">Open dashboard</button>
-          <p class="form-notice" id="adminNotice"></p>
-        </form>
-      </section>
-    `;
-    return;
-  }
-
-  const b=state.books.find(x=>x.id===state.editingBook)||{};
-  const ch=state.characters.find(x=>x.id===state.editingCharacter)||{};
-  const c=state.content;
-
-  app.innerHTML=`
-    ${pageHero(
-      'Shop dashboard',
-      'Hello, bookseller.',
-      'Edit your shelf and your storefront without opening code.'
-    )}
-
-    <section class="section">
-      <div class="admin-wrap">
-
-        <div class="settings">
-          <div>
-            <h2 style="margin:0">Store settings</h2>
-            <p class="muted">Free-shipping threshold</p>
-          </div>
-
-          <label>Amount (₹)
-            <input id="shippingInput" type="number" min="0" value="${state.shipping}" />
-          </label>
-
-          <button class="button button-dark" onclick="saveShipping()">Save setting</button>
-          <button class="tiny-button" onclick="adminLogout()">Sign out</button>
-        </div>
-
-        <form class="content-editor" onsubmit="saveContent(event)">
-          <h2>Home page words</h2>
-
-          <div class="content-grid">
-            <label>Announcement<input name="announcement" value="${esc(c.announcement)}" /></label>
-            <label>Hero eyebrow<input name="heroEyebrow" value="${esc(c.heroEyebrow)}" /></label>
-            <label>Hero title<input name="heroTitle" value="${esc(c.heroTitle)}" /></label>
-            <label>Highlighted words<input name="heroHighlight" value="${esc(c.heroHighlight)}" /></label>
-
-            <label class="full">
-              Hero text
-              <textarea name="heroCopy">${esc(c.heroCopy)}</textarea>
-            </label>
-
-            <label>Hero button<input name="heroButton" value="${esc(c.heroButton)}" /></label>
-            <label>Collections title<input name="collectionTitle" value="${esc(c.collectionTitle)}" /></label>
-
-            <label class="full">
-              Gift-strip message
-              <input name="saleText" value="${esc(c.saleText)}" />
-            </label>
-
-            <label>Club eyebrow<input name="clubEyebrow" value="${esc(c.clubEyebrow)}" /></label>
-            <label>Club title<input name="clubTitle" value="${esc(c.clubTitle)}" /></label>
-
-            <label class="full">
-              Club text
-              <textarea name="clubText">${esc(c.clubText)}</textarea>
-            </label>
-
-            <label>Age card eyebrow<input name="ageEyebrow" value="${esc(c.ageEyebrow)}" /></label>
-            <label>Age card title<input name="ageTitle" value="${esc(c.ageTitle)}" /></label>
-
-            <label class="full">
-              Age card text
-              <textarea name="ageText">${esc(c.ageText)}</textarea>
-            </label>
-          </div>
-
-          <br>
-          <button class="button button-dark">Save home page</button>
-        </form>
-
-        <h2 class="admin-section-title">Character & collection cards</h2>
-
-        <form class="admin-form" onsubmit="saveCharacter(event)">
-          <h2>${ch.id?'Edit':'Add'} a character card</h2>
-
-          <label>Card title
-            <input required name="title" value="${esc(ch.title||'')}" placeholder="Animal friends" />
-          </label>
-
-          <label>What it says
-            <input required name="description" value="${esc(ch.description||'')}" placeholder="A short description" />
-          </label>
-
-          <label>Book genre to open
-            <input required name="target" value="${esc(ch.target||'Adventure')}" placeholder="Magic" />
-          </label>
-
-          <label>Emoji (if no image)
-            <input name="icon" maxlength="4" value="${esc(ch.icon||'✨')}" />
-          </label>
-
-          <label>Card colour
-            <input name="color" value="${esc(ch.color||'#b9e4df')}" placeholder="#b9e4df" />
-          </label>
-
-          <label>Image link (optional)
-            <input name="imageUrl" value="${esc(ch.image||'')}" placeholder="https://…" />
-          </label>
-
-          <label class="full">
-            Or upload a card picture
-            <input name="imageFile" type="file" accept="image/*" />
-            <span class="photo-note">Use a small image (under 1 MB) in this offline demo.</span>
-          </label>
-
-          <button class="button button-dark">${ch.id?'Save card':'Add card'}</button>
-          ${ch.id?'<button type="button" class="tiny-button" onclick="cancelCharacterEdit()">Cancel</button>':''}
-        </form>
-
-        <div class="collection-grid">
-          ${state.characters.map(x=>`
-            <article class="collection" style="background:${x.color}">
-              ${x.image
-                ? `<img class="collection-photo" src="${x.image}" alt="">`
-                : `<span>${esc(x.icon)}</span>`}
-
-              <h2>${esc(x.title)}</h2>
-              <p>${esc(x.description)}</p>
-
-              <button class="tiny-button" onclick="startCharacterEdit(${x.id})">Edit</button>
-              <button class="tiny-button" onclick="deleteCharacter(${x.id})">Remove</button>
-            </article>
-          `).join('')}
-        </div>
-
-        <h2 class="admin-section-title">Books & covers</h2>
-
-        <form class="admin-form" onsubmit="saveBook(event)">
-          <h2>${b.id?'Edit':'Add'} a book</h2>
-
-          <label>Title
-            <input required name="title" value="${esc(b.title||'')}" placeholder="Book title" />
-          </label>
-
-          <label>Author
-            <input required name="author" value="${esc(b.author||'')}" placeholder="Author" />
-          </label>
-
-          <label>Price (₹)
-            <input required type="number" min="1" name="price" value="${b.price||''}" placeholder="349" />
-          </label>
-
-          <label>Age group
-            <input required name="age" value="${esc(b.age||'')}" placeholder="4–6" />
-          </label>
-
-          <label>Genre
-            <input required name="genre" value="${esc(b.genre||'')}" placeholder="Adventure" />
-          </label>
-
-          <label>Cover colour
-            <input name="color" value="${esc(b.color||'#7767c9')}" placeholder="#7767c9" />
-          </label>
-
-          <label>Cover emoji (if no image)
-            <input name="icon" maxlength="4" value="${esc(b.icon||'📚')}" />
-          </label>
-
-          <label>Cover image link (optional)
-            <input name="imageUrl" value="${esc(b.image||'')}" placeholder="https://…" />
-          </label>
-
-          <label>Rating
-            <input type="number" name="rating" min="0" max="5" step="0.1" value="${b.rating||5}" />
-          </label>
-
-          <label>Review count
-            <input type="number" name="reviews" min="0" value="${b.reviews||0}" />
-          </label>
-
-          <label class="full">
-            Or upload a custom book cover
-            <input name="imageFile" type="file" accept="image/*" />
-            <span class="photo-note">Your image will show on the home page, catalogue and book detail. Keep it under 1 MB for reliable browser storage.</span>
-          </label>
-
-          <label class="full">
-            Description
-            <textarea required name="description" placeholder="A short, enticing book description">${esc(b.description||'')}</textarea>
-          </label>
-
-          <button class="button button-dark">${b.id?'Save book':'Add book to shelf'}</button>
-          ${b.id?'<button type="button" class="tiny-button" onclick="cancelBookEdit()">Cancel</button>':''}
-        </form>
-
-        <div class="admin-toolbar">
-          <div>
-            <h2>Book inventory</h2>
-            <p class="muted">${state.books.length} books in your catalogue</p>
-          </div>
-        </div>
-
-        <table class="admin-table">
-          <thead>
-            <tr>
-              <th>Book</th>
-              <th>Price</th>
-              <th>Age</th>
-              <th>Status</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-
-          <tbody>
-            ${state.books.map(x=>`
-              <tr>
-                <td>
-                  <b>${esc(x.title)}</b><br>
-                  <span class="muted">${esc(x.author)}</span>
-                </td>
-                <td>${money(x.price)}</td>
-                <td>${x.age}</td>
-                <td>
-                  <span class="status ${x.available?'available':'sold'}">
-                    ${x.available?'Available':'Sold'}
-                  </span>
-                </td>
-                <td>
-                  <button class="tiny-button" onclick="startBookEdit(${x.id})">Edit</button>
-                  <button class="tiny-button" onclick="toggleSold(${x.id})">Mark ${x.available?'sold':'available'}</button>
-                  <button class="tiny-button" onclick="deleteBook(${x.id})">Remove</button>
-                </td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-
-      </div>
-    </section>
-  `;
-}
 function renderCollabs(){
   app.innerHTML=`
     ${pageHero(
@@ -3915,22 +3659,6 @@ function filterAge(a){
   renderBooks();
 }
 
-function toggleSold(id){
-  const b=state.books.find(x=>x.id===id);
-  b.available=!b.available;
-  save();
-  renderAdmin();
-}
-
-function deleteBook(id){
-  if(confirm('Remove this book from your shelf?')){
-    state.books=state.books.filter(b=>b.id!==id);
-    state.cart=state.cart.filter(x=>x.id!==id);
-    save();
-    renderAdmin();
-  }
-}
-
 function photoFromForm(form,done){
   const file=form.querySelector('[name="imageFile"]').files[0];
 
@@ -3948,104 +3676,6 @@ function photoFromForm(form,done){
 
   reader.onload=()=>done(reader.result);
   reader.readAsDataURL(file);
-}
-
-function saveBook(e){
-  e.preventDefault();
-
-  const form=e.currentTarget;
-  const f=new FormData(form);
-
-  photoFromForm(form,image=>{
-    const old=state.books.find(x=>x.id===state.editingBook);
-
-    const book={
-      id:old?.id||Date.now(),
-      title:f.get('title').trim(),
-      author:f.get('author').trim(),
-      price:Number(f.get('price')),
-      age:f.get('age').trim(),
-      genre:f.get('genre').trim(),
-      icon:f.get('icon').trim()||'📚',
-      color:f.get('color').trim()||'#7767c9',
-      image:image||old?.image||'',
-      description:f.get('description').trim(),
-      rating:Number(f.get('rating'))||5,
-      reviews:Math.max(0,Number(f.get('reviews'))||0),
-      available:old?.available??true
-    };
-
-    if(old)
-      Object.assign(old,book);
-    else
-      state.books.push(book);
-
-    state.editingBook=null;
-    save();
-    renderAdmin();
-  });
-}
-
-function startBookEdit(id){
-  state.editingBook=id;
-  renderAdmin();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function cancelBookEdit(){
-  state.editingBook=null;
-  renderAdmin();
-}
-
-function saveCharacter(e){
-  e.preventDefault();
-
-  const form=e.currentTarget;
-  const f=new FormData(form);
-
-  photoFromForm(form,image=>{
-    const old=state.characters.find(
-      x=>x.id===state.editingCharacter
-    );
-
-    const item={
-      id:old?.id||Date.now(),
-      title:f.get('title').trim(),
-      description:f.get('description').trim(),
-      target:f.get('target').trim()||'All',
-      icon:f.get('icon').trim()||'✨',
-      color:f.get('color').trim()||'#b9e4df',
-      image:image||old?.image||''
-    };
-
-    if(old)
-      Object.assign(old,item);
-    else
-      state.characters.push(item);
-
-    state.editingCharacter=null;
-    save();
-    renderAdmin();
-  });
-}
-
-function startCharacterEdit(id){
-  state.editingCharacter=id;
-  renderAdmin();
-  window.scrollTo({top:0,behavior:'smooth'});
-}
-
-function cancelCharacterEdit(){
-  state.editingCharacter=null;
-  renderAdmin();
-}
-
-function deleteCharacter(id){
-  if(confirm('Remove this character card?')){
-    state.characters=state.characters.filter(x=>x.id!==id);
-    save();
-    renderAdmin();
-  }
 }
 
 function saveContent(e){
@@ -4069,25 +3699,6 @@ function saveShipping(){
 
   save();
   alert('Free-shipping threshold saved.');
-}
-
-function adminLogin(e){
-  e.preventDefault();
-
-  if(document.querySelector('#adminPass').value==='storybook'){
-    state.admin=true;
-    sessionStorage.setItem('ss-admin','yes');
-    renderAdmin();
-  }else{
-    document.querySelector('#adminNotice').textContent=
-      'That passcode doesn’t match. Try “storybook”.';
-  }
-}
-
-function adminLogout(){
-  state.admin=false;
-  sessionStorage.removeItem('ss-admin');
-  renderAdmin();
 }
 
 function sendMessage(e){
@@ -4526,27 +4137,6 @@ items: state.cart.map(item => ({
 // This happens ONLY after Razorpay payment has been
 // successfully verified by the Supabase server.
 
-const orderedBookIds = [
-  ...new Set(
-    state.cart
-      .filter(item => (item.type || 'book') === 'book')
-      .map(item => item.id)
-  )
-];
-
-for (const bookId of orderedBookIds) {
-  const { error: availabilityError } = await supabase
-    .from('books')
-    .update({ available: false })
-    .eq('id', bookId);
-
-  if (availabilityError) {
-    console.error(
-      `Could not update availability for book ${bookId}:`,
-      availabilityError
-    );
-  }
-}
 
 renderOrderConfirmation(
   verifyData.order?.order_number ||
