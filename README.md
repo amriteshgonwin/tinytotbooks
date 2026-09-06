@@ -1,26 +1,41 @@
 # TinyTotBooks 📚
 
-Started with:
+So... I'm a biology student.
 
-**“hmm what if I made a bookstore”**
+My sister has a small children's book business, and at some point I thought:
 
-…and then somehow this happened.
+**“I'll just make her a website.”**
 
-TinyTotBooks is a little online bookstore I vibecoded from scratch — books, cart, bundles, payments, inventory, orders, tracking, the whole circus.
+That sentence was the beginning of a very unnecessary rabbit hole.
 
-No grand startup pitch.
-No revolutionary idea.
+What started as *“let me put some books online”* slowly turned into a proper little bookstore — with a storefront, book pages, cart, bundles, inventory, checkout, Razorpay payments, orders, tracking... basically everything I kept thinking *“eh, might as well add this too”* to.
 
-I just wanted to see how far I could take a random idea if I kept building it.
+I didn't really know what I was doing when I started.
 
-And apparently the answer was **“pretty damn far.”**
+A lot of this was built by trial, error, breaking things, fixing them, breaking them again, and asking increasingly specific questions at increasingly questionable hours.
 
-### made with
+And honestly, that's what makes this project fun.
 
-`HTML` `CSS` `JavaScript` `Supabase` `Razorpay`
+It's not some huge startup.
+It's not a college assignment.
+It's not even remotely related to biology.
 
-Still adding stuff.
-Still breaking stuff.
-Still fixing stuff at 2 AM.
+It's just a real thing that someone actually needed, and I decided to build it.
 
-**¯_(ツ)_/¯**
+### The stack
+
+`HTML` · `CSS` · `JavaScript` · `Supabase` · `PostgreSQL` · `Razorpay` · `GitHub Pages`
+
+Still a work in progress.
+
+Still adding random ideas.
+
+Still occasionally wondering why I thought **“I'll just make a website”** was going to be easy.
+
+---
+
+### TinyTotBooks
+
+**Started for my sister.
+Built because I got carried away.**
+
