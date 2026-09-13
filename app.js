@@ -519,7 +519,12 @@ function renderHome(){
       </div>
 
       <div class="book-grid">
-        ${state.books.filter(b=>b.available).slice(0,4).map(bookCard).join('')}
+${[...state.books]
+  .filter(b => b.available)
+  .sort(() => Math.random() - 0.5)
+  .slice(0,4)
+  .map(bookCard)
+  .join('')}
       </div>
     </section>
 
@@ -3538,6 +3543,18 @@ function renderBookDetail(id){
                 : ''
             }
           </div>
+
+${b.youtube_url ? `
+  <a
+    class="book-detail-youtube"
+    href="${esc(b.youtube_url)}"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    <span>▶</span>
+    Watch on YouTube
+  </a>
+` : ''}
 
           <p class="book-detail-description">
             ${esc(b.description || '')}

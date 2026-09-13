@@ -585,10 +585,42 @@
             class="status"
           ></div>
 
+              </div>
+
+        <!-- YOUTUBE VIDEO -->
+
+          <div
+               id="youtubeEditor"
+             class="hidden"
+             style="margin-top:20px;"
+            >
+
+          <label for="youtubeUrl">
+            YouTube video URL
+          </label>
+
+          <input
+            id="youtubeUrl"
+            type="url"
+            placeholder="https://www.youtube.com/watch?v=..."
+          >
+
+          <button
+            id="saveYoutubeButton"
+            class="primary"
+            type="button"
+          >
+            Save YouTube video
+          </button>
+
+          <div
+            id="youtubeStatus"
+            class="status"
+          ></div>
+
         </div>
 
       </section>
-
 
       <!-- BOOK IMAGES -->
 
@@ -1044,6 +1076,17 @@ const cancelCouponEditButton =
 const couponFormStatus =
   document.getElementById('couponFormStatus');
 
+  const youtubeUrl =
+  document.getElementById('youtubeUrl');
+
+const youtubeEditor =
+  document.getElementById('youtubeEditor');
+
+const saveYoutubeButton =
+  document.getElementById('saveYoutubeButton');
+
+const youtubeStatus =
+  document.getElementById('youtubeStatus');
 
 /* =========================================================
    STATE
@@ -1553,7 +1596,9 @@ bookSelect.addEventListener(
       conditionEditor.classList.add(
         'hidden'
       );
-
+youtubeEditor.classList.add(
+  'hidden'
+);
       return;
     }
 
@@ -1571,6 +1616,11 @@ bookSelect.addEventListener(
 
     bookInfo.textContent =
       `${selectedBook.title} · ${selectedBook.author}`;
+
+    youtubeUrl.value =
+      selectedBook.youtube_url || '';
+
+youtubeEditor.classList.remove('hidden');
 
     managerTools.classList.remove(
       'hidden'
@@ -2564,6 +2614,68 @@ saveConditionButton.addEventListener(
   }
 );
 
+saveYoutubeButton.addEventListener(
+  'click',
+  async () => {
+
+    if (!selectedBook) return;
+
+    const url =
+      youtubeUrl.value.trim();
+
+      if (url) {
+  try {
+    const parsedUrl = new URL(url);
+
+    const validHost =
+      parsedUrl.hostname === 'youtube.com' ||
+      parsedUrl.hostname === 'www.youtube.com' ||
+      parsedUrl.hostname === 'm.youtube.com' ||
+      parsedUrl.hostname === 'youtu.be';
+
+    if (
+      parsedUrl.protocol !== 'https:' ||
+      !validHost
+    ) {
+      youtubeStatus.textContent =
+        'Please enter a valid YouTube URL.';
+
+      return;
+    }
+  } catch {
+    youtubeStatus.textContent =
+      'Please enter a valid YouTube URL.';
+
+    return;
+  }
+}
+
+    const { error } =
+      await supabaseClient
+        .from('books')
+        .update({
+          youtube_url: url || null
+        })
+        .eq('id', selectedBook.id);
+
+    if (error) {
+      console.error(error);
+
+      youtubeStatus.textContent =
+        'Could not save YouTube URL.';
+
+      return;
+    }
+
+    selectedBook.youtube_url =
+      url || null;
+
+    youtubeStatus.textContent =
+      url
+        ? 'YouTube video saved.'
+        : 'YouTube video removed.';
+  }
+);
 
 /* =========================================================
    ORDERS

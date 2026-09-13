@@ -7013,3 +7013,82 @@ for sort
   margin: 0;
 }
 
+/* Book detail meta row */
+.book-detail-meta-row{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:10px;
+  margin-bottom:22px;
+}
+
+/* Rating / reviews pill */
+.book-detail-rating{
+  display:inline-flex;
+  align-items:center;
+  padding:7px 11px;
+  border-radius:99px;
+  background:#fff;
+  border:1px solid var(--line);
+  color:#9b6f00;
+  font-size:.88rem;
+}
+
+/* YouTube button */
+.book-detail-youtube{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  min-height:36px;
+  padding:8px 13px;
+  border-radius:99px;
+  background:#ff0033;
+  color:#fff;
+  border:1px solid #ff0033;
+  font-size:.84rem;
+  font-weight:700;
+  text-decoration:none;
+  box-shadow:0 5px 14px #ff003322;
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+.book-detail-youtube:hover{
+  transform:translateY(-2px);
+  background:#e6002f;
+  box-shadow:0 8px 18px #ff003338;
+}
+
+/* Play icon */
+.book-detail-youtube span{
+  display:grid;
+  place-items:center;
+  width:19px;
+  height:19px;
+  border-radius:5px;
+  background:#fff;
+  color:#ff0033;
+  font-size:.62rem;
+  line-height:1;
+  padding-left:1px;
+}
+
+/* Keyboard accessibility */
+.book-detail-youtube:focus-visible{
+  outline:3px solid #ff003355;
+  outline-offset:3px;
+}
+
+/* Mobile */
+@media(max-width:650px){
+  .book-detail-meta-row{
+    align-items:stretch;
+  }
+
+  .book-detail-youtube{
+    flex:1 1 180px;
+  }
+}
