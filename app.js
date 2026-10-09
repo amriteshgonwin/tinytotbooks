@@ -3808,11 +3808,36 @@ document.querySelector('#checkoutButton').onclick=()=>{
 let activeOrderId = null;
 let activeRazorpayOrderId = null;
 
+// Privacy Policy acknowledgement
+
+const privacyPolicyCheckbox =
+  document.querySelector('#privacyPolicyAccepted');
+
+const paySecurelyButton =
+  document.querySelector('#paySecurelyButton');
+
+// Keep payment disabled until the checkbox is ticked.
+privacyPolicyCheckbox.addEventListener('change', () => {
+  paySecurelyButton.disabled = !privacyPolicyCheckbox.checked;
+});
+
 document.querySelector('#checkoutForm').onsubmit = async e => {
   e.preventDefault();
 
-  if (!state.cart.length) return;
+  // Never initiate checkout without Privacy Policy acknowledgement.
+  if (!privacyPolicyCheckbox.checked) {
+    privacyPolicyCheckbox.setCustomValidity(
+      'Please acknowledge the Privacy Policy before continuing.'
+    );
 
+    privacyPolicyCheckbox.reportValidity();
+    paySecurelyButton.disabled = true;
+    return;
+  }
+
+  privacyPolicyCheckbox.setCustomValidity('');
+
+  if (!state.cart.length) return;
   const form = e.currentTarget;
   const formData = new FormData(form);
 

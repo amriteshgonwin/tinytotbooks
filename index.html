@@ -41,6 +41,10 @@
 <div class="footer-links">
   <h4>Useful</h4>
 
+<a href="privacy-policy.html">
+  Privacy Policy
+</a>
+
   <a href="#shipping">
     Shipping &amp; Delivery
   </a>
@@ -409,13 +413,38 @@
   </div>
 
 
+  <!-- PRIVACY POLICY ACKNOWLEDGEMENT -->
+
+  <div class="privacy-consent">
+
+    <input
+      id="privacyPolicyAccepted"
+      name="privacyPolicyAccepted"
+      type="checkbox"
+      required
+    />
+
+    <label for="privacyPolicyAccepted">
+      I have read and acknowledge the
+      <a
+        href="privacy-policy.html"
+        target="_blank"
+        rel="noopener noreferrer"
+      >Privacy Policy</a>.
+    </label>
+
+  </div>
+
+  <!-- PAYMENT BUTTON -->
+
   <button
     class="button button-dark"
+    id="paySecurelyButton"
     type="submit"
+    disabled
   >
     Pay securely
   </button>
-
 </form>
 
 <p id="checkoutNotice" class="form-notice"></p>
