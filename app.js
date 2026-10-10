@@ -22,7 +22,7 @@ const defaultContent={
   heroEyebrow:'A little shop full of wonder',
   heroTitle:'Stories that make',
   heroHighlight:'little minds bloom.',
-  heroCopy:'Thoughtfully chosen books for curious kids — packed with imagination, kindness, and plenty of giggles.',
+  heroCopy:'Little readers deserve privacy, too! Please read our Privacy Policy in the footer. By using TinyTotBooks, you acknowledge this policy, subject to applicable law.',
   heroButton:'Browse current offers',
   collectionTitle:'A story for every kind of day',
   saleText:'Curious about the little story behind TinyTotBooks?',
