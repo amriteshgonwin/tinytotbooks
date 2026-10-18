@@ -17,7 +17,7 @@ const seedBooks = [
 ];
 
 const defaultContent={
-  announcement:'Hi',
+  announcement:'BUILDING THE SHELF',
 
   heroEyebrow:'A little shop full of wonder',
   heroTitle:'Stories that make',
@@ -169,11 +169,11 @@ async function renderShipping(){
     <section class="shipping-page">
 
       <div class="shipping-hero">
-        <span class="eyebrow">Shipping & Delivery</span>
+        <span class="eyebrow">Policies & Terms</span>
 
         <h1>
-          A little journey<br>
-          from our shelf to yours.
+          Shipping, Delivery, Cancellations, <br>
+          Return, Refunds and T&Cs
         </h1>
 
         <p>
